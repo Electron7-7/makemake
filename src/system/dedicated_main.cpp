@@ -1,10 +1,22 @@
-#include "common/platform.hpp"
 #include "common/debugging.hpp"
+#include "common/platform.hpp"
+#include "arguments/arguments.hpp"
+#include "arguments/arguments_handler.hpp"
 
 // DedicatedMain gets called by all platforms
-int DedicatedMain(int argc, char* argv[])
+int DedicatedMain(int argc, char** argv)
 {
-    PRINT("Hello World!");
+    global_ArgumentsHandler->AddFlag(Flags::Help);
+    global_ArgumentsHandler->AddOption(Options::DebugPrint);
+
+    global_ArgumentsHandler->ParseArguments(argc, argv);
+
+    if(global_ArgumentsHandler->FlagActive(Flags::Help))
+        PRINTDEBUG("Help");
+
+    if(global_ArgumentsHandler->OptionActive(Options::DebugPrint))
+        PRINTDEBUG("Debug Print: " + std::string(global_ArgumentsHandler->OptionValue(Options::DebugPrint)));
+
     return 0;
 }
 
@@ -29,7 +41,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #endif // PLAT_APPLE
 
 #ifdef PLAT_LINUX
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
     int linux_return = DedicatedMain(argc, argv);
     return linux_return;
