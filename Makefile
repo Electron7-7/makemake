@@ -63,10 +63,10 @@ export _V_BUILD_VER ?= $(_V_BUILD_PATH_RELEASE)
 export _V_BUILD_DIR ?= $(_V_BUILD_ROOT)/$(_V_BUILD_PLAT)_$(_V_BUILD_VER)
 
 
-SRC_DIRS :=    \
-	src/common \
-	src/core   \
-	src/system \
+SRC_DIRS :=       \
+	src/arguments \
+	src/common    \
+	src/system    \
 
 CXX_SRCS := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.cpp))
 CC_SRCS  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
