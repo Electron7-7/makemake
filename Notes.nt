@@ -1,0 +1,6 @@
+[06/20/25]
+I want to practice my programming by writing a C++ package manager... in C++. What could go wrong?
+
+Ooh, NOTE TO SELF: I could automate my Makefile setup (and kinda really want to). That could also be a prt of this project as it'll probably be invoking GNU make under the hood (altho, I could just manually call compilers and shit myself... oooh...).
+
+Finally fucking finished the build system and the project structure. On god, this is all just validating the project's existence: ~4hrs spent on setup alone.
