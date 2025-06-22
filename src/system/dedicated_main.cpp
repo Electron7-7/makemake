@@ -1,21 +1,27 @@
-#include "common/debugging.hpp"
 #include "common/platform.hpp"
 #include "arguments/arguments.hpp"
-#include "arguments/arguments_handler.hpp"
+#include "arguments/arguments_parser.hpp"
+#include "argument_handlers.hpp"
 
-// DedicatedMain gets called by all platforms
 int DedicatedMain(int argc, char** argv)
 {
-    global_ArgumentsHandler->AddFlag(Flags::Help);
-    global_ArgumentsHandler->AddOption(Options::DebugPrint);
+    // Add valid flags
+    global_ArgumentsParser->AddFlag(Flags::Help);
+    global_ArgumentsParser->AddFlag(Flags::Version);
 
-    global_ArgumentsHandler->ParseArguments(argc, argv);
+    // Add valid options
+    global_ArgumentsParser->AddOption(Options::DebugPrint);
 
-    if(global_ArgumentsHandler->FlagActive(Flags::Help))
-        PRINTDEBUG("Help");
+    // Parse all arguments
+    global_ArgumentsParser->ParseArguments(argc, argv);
 
-    if(global_ArgumentsHandler->OptionActive(Options::DebugPrint))
-        PRINTDEBUG("Debug Print: " + std::string(global_ArgumentsHandler->OptionValue(Options::DebugPrint)));
+    // Handle flags
+    if(unsigned short return_value = FlagsHandler(global_ArgumentsParser->GetFlags()) != Err::NO_ERROR)
+        return return_value;
+
+    // Handle options
+    if(unsigned short return_value = OptionsHandler(global_ArgumentsParser->GetOptions()) != Err::NO_ERROR)
+        return return_value;
 
     return 0;
 }
