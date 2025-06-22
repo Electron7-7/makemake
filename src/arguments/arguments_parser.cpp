@@ -69,9 +69,9 @@ ErrorCode ArgumentsParser::ParseArguments(int argc, char** argv)
 
         for(unsigned int i_o = 0 ; i_o < _valid_options.size() ; i_o++)
         {
-            if(_valid_options.at(i_o) == argv[i] && (i+1) < argc)
+            if(_valid_options.at(i_o) == argv[i])
             {
-                _valid_options.at(i_o).SetValue(argv[++i]);
+                if((i+1) < argc) _valid_options.at(i_o).SetValue(argv[++i]);
                 _options.insert(_options.end(), _valid_options.at(i_o));
                 continue;
             }

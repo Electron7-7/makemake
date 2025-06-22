@@ -17,7 +17,7 @@ ErrorCode OptionsHandler(std::vector<Option>* options)
             continue;
         }
 
-        if(option == Options::DebugPrint && option.HasValue())
+        if(option == Options::DebugPrint)
         {
             PRINT("DebugPrint: " + option.GetValue());
             continue;
