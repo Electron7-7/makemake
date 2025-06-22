@@ -24,6 +24,6 @@ R"~(
         -v, --version   print program version
 )~";
 
-inline std::string _Version_Printout = "0.0.1";
+inline std::string _Version_Printout = "cpppp v0.0.1";
 
 #endif // ARGUMENTS_H
