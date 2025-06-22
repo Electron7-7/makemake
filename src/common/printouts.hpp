@@ -7,22 +7,23 @@
 // I've decided to make sure it always prints, even in the release builds.
 #define PRINTCATASTROPHIC(content) std::cerr << std::string("[CATASTROPHIC ERROR]\t" + std::string(content)) << std::endl
 
+// I want the standard printout macro to be available, as well
+#define PRINT(content) std::cout << std::string(content) << std::endl
+
 #ifdef CPPPP_DEBUGGING // See Makefile
 
 // PRINTOUT MACROS
-#define PRINT(content) std::cout << std::string(content) << std::endl
-#define PRINTLABEL(label, content) std::cout << std::string(std::string(label) + "\t") << std::string(content) << std::endl
+#define PRINTLABEL(label, content) PRINT(std::string(label) + "\t" + std::string(content))
 #define PRINTERR(content) PRINTLABEL("[ERROR]", content)
 #define PRINTWARN(content) PRINTLABEL("[WARNING]", content)
 #define PRINTDEBUG(content) PRINTLABEL("[DEBUG]", content)
 
-#else // CPPPP_DEBUGGING
+#else
 
-#define PRINT(content)
-#define PRINTERR(content)
 #define PRINTLABEL(label, content)
 #define PRINTWARN(content)
 #define PRINTDEBUG(content)
+#define PRINTERR(content) std::cerr << std::string("[ERROR]\t" + std::string(content)) << std::endl
 
 #endif // CPPPP_DEBUGGING
 #endif // DEBUGGING_H
