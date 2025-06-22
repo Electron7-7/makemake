@@ -1,10 +1,28 @@
 #include "common/platform.hpp"
-#include "common/debugging.hpp"
+#include "arguments/arguments.hpp"
+#include "arguments/arguments_parser.hpp"
+#include "argument_handlers.hpp"
 
-// DedicatedMain gets called by all platforms
-int DedicatedMain(int argc, char* argv[])
+int DedicatedMain(int argc, char** argv)
 {
-    PRINT("Hello World!");
+    // Add valid flags
+    global_ArgumentsParser->AddFlag(Flags::Help);
+    global_ArgumentsParser->AddFlag(Flags::Version);
+
+    // Add valid options
+    global_ArgumentsParser->AddOption(Options::DebugPrint);
+
+    // Parse all arguments
+    global_ArgumentsParser->ParseArguments(argc, argv);
+
+    // Handle flags
+    if(unsigned short return_value = FlagsHandler(global_ArgumentsParser->GetFlags()) != Err::NO_ERROR)
+        return return_value;
+
+    // Handle options
+    if(unsigned short return_value = OptionsHandler(global_ArgumentsParser->GetOptions()) != Err::NO_ERROR)
+        return return_value;
+
     return 0;
 }
 
@@ -29,7 +47,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #endif // PLAT_APPLE
 
 #ifdef PLAT_LINUX
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
     int linux_return = DedicatedMain(argc, argv);
     return linux_return;
