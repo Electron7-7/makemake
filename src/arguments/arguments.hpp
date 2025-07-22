@@ -2,7 +2,6 @@
 #define ARGUMENTS_H
 
 #include "argument.hpp"
-#include <string>
 
 namespace Flags
 {
@@ -16,14 +15,13 @@ namespace Options
     const Option GenerateMakefile ("--makefile", "-m");
 }
 
-inline std::string _Help_Printout =
-R"~(
-    Usage: cpppp [-hv]
+constexpr const char* _Help_Printout =
+R"~(    Usage: cpppp [-hv]
 
         -h, --help      print help document
         -v, --version   print program version
 )~";
 
-inline std::string _Version_Printout = "cpppp v0.0.1";
+constexpr const char* _Version_Printout = "cpppp v0.0.1";
 
 #endif // ARGUMENTS_H

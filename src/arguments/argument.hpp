@@ -11,8 +11,8 @@ public:
     constexpr _Arg(const _Arg& CopyFrom): _Arg(CopyFrom._long_name, CopyFrom._short_name) {}
     constexpr _Arg(const char* Name): _Arg(Name, Name) {}
 
-    constexpr std::string LongName()  const { return _long_name;  }
-    constexpr std::string ShortName() const { return _short_name; }
+    constexpr const char* LongName()  const { return _long_name;  }
+    constexpr const char* ShortName() const { return _short_name; }
 
     constexpr bool operator==(const _Arg& other) const { return (CompareStrings(_long_name, other._long_name) || CompareStrings(_short_name, other._short_name)); }
     constexpr bool operator!=(const _Arg& other) const { return !(*this == other);   }
@@ -40,7 +40,7 @@ public:
     using _Arg::_Arg;
 
     void SetValue(const char* Value) { _value = Value; }
-    std::string GetValue() const { return _value; }
+    const char* GetValue() const { return _value; }
     bool HasValue() const { return (!CompareStrings(_value, "")); } // FIXME: Kind of redundant, since I can just check that 'GetValue' isn't an empty string...
 
 private:
