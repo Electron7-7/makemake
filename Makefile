@@ -1,177 +1,150 @@
-# Because of the way I write Makefiles and export variables, I like to make my variable names as unique as possible.
-# To do that, I'll prepend all variable names with '_V_' (v for "vroom"). That's why they look like that.
-# Frankly, I might try and limit this to only exported variables but I guess we'll just have to wait and see.
-
-export _V_COMMON_DEBUG_FLAGS  := -g -Wall -O0 -D CPPPP_DEBUGGING
-export _V_LINUX_DEBUG_FLAGS   := -fsanitize=address
-export _V_WINDOWS_DEBUG_FLAGS :=
-export _V_RELEASE_FLAGS       := -O3
-export _V_COMMON_FLAGS        := -frtti -D CPPPP_FORWARD_DECLARATIONS
-export _V_CXX_STD_FLAG        := -std=c++20
-
-export _V_LINUX_LDFLAGS   := -L src/system/linux/lib
-export _V_WINDOWS_LDFLAGS := -L src/system/windows/lib
-
-export _V_LINUX_INCLUDE   := -I src/system/linux/include
-export _V_WINDOWS_INCLUDE := -I src/system/windows/include
-export _V_COMMON_INCLUDE  := -I src -I src/thirdparty
-
-export _V_BUILD_ROOT         := build
-export _V_BUILD_PATH_LINUX   := linux
-export _V_BUILD_PATH_WINDOWS := windows
-export _V_BUILD_PATH_RELEASE := release
-export _V_BUILD_PATH_DEBUG   := debug
-
-# CPPPP stands for "C++ Package Proprietor"
-export _V_NAME_BASE := cpppp
-
-export _V_VERSION_FLAGS ?= $(_V_RELEASE_FLAGS)
+LINUX_CXX := clang++
+LINUX_CC  := clang
 
 ifeq ($(OS),Windows_NT)
-# Platform == Windows
-export _V_LINUX_CXX   ?= g++
-export _V_LINUX_CC    ?= gcc
-export _V_WINDOWS_CXX ?= g++
-export _V_WINDOWS_CC  ?= gcc
-
-export _V_NAME        ?= $(_V_NAME_BASE).exe
-export _V_BUILD_PLAT  ?= $(_V_BUILD_PATH_WINDOWS)
-export _V_DEBUG_FLAGS ?= $(_V_COMMON_DEBUG_FLAGS) $(_V_WINDOWS_DEBUG_FLAGS)
-export CXX            := $(_V_WINDOWS_CXX)
-export CC             := $(_V_WINDOWS_CC)
-export CXXFLAGS       ?= $(_V_COMMON_FLAGS) $(_V_VERSION_FLAGS) $(_V_CXX_STD_FLAG)
-export CCFLAGS        ?= $(_V_COMMON_FLAGS) $(_V_VERSION_FLAGS)
-export INCLUDE        ?= $(_V_COMMON_INCLUDE) $(_V_WINDOWS_INCLUDE)
+	WINDOWS_CXX := g++
+	WINDOWS_CC  := gcc
 else
-# Platform == Linux
-export _V_LINUX_CXX   ?= clang++
-export _V_LINUX_CC    ?= clang
-export _V_WINDOWS_CXX ?= x86_64-w64-mingw32-g++
-export _V_WINDOWS_CC  ?= x86_64-w64-mingw32-gcc
-
-export _V_NAME        ?= $(_V_NAME_BASE)
-export _V_BUILD_PLAT  ?= $(_V_BUILD_PATH_LINUX)
-export _V_DEBUG_FLAGS ?= $(_V_COMMON_DEBUG_FLAGS) $(_V_LINUX_DEBUG_FLAGS)
-export CXX            := $(_V_LINUX_CXX)
-export CC             := $(_V_LINUX_CC)
-export CXXFLAGS       ?= $(_V_COMMON_FLAGS) $(_V_VERSION_FLAGS) $(_V_CXX_STD_FLAG)
-export CCFLAGS        ?= $(_V_COMMON_FLAGS) $(_V_VERSION_FLAGS)
-export INCLUDE        ?= $(_V_COMMON_INCLUDE) $(_V_LINUX_INCLUDE)
+	WINDOWS_CXX := x86_64-w64-mingw32-g++
+	WINDOWS_CC  := x86_64-w64-mingw32-gcc
 endif
 
-export _V_BUILD_VER ?= $(_V_BUILD_PATH_RELEASE)
-export _V_BUILD_DIR ?= $(_V_BUILD_ROOT)/$(_V_BUILD_PLAT)_$(_V_BUILD_VER)
+FLAGS_DEBUG_COMMON    := -g -Wall -O0 -D DEBUGGING
+FLAGS_DEBUG_LINUX     := -fsanitize=address
+FLAGS_DEBUG_WINDOWS   := # Nothing yet
+FLAGS_RELEASE_COMMON  := -O3
+FLAGS_RELEASE_WINDOWS := # Nothing yet
+FLAGS_RELEASE_LINUX   := # Nothing yet
+FLAGS_CXX_COMMON      := -std=c++20
+FLAGS_CC_COMMON       := # Nothing yet
+FLAGS_WINDOWS         := -mwindows -static
+FLAGS_LINUX           := # Nothing yet
+LDFLAGS_LINUX         := # Nothing yet
+LDFLAGS_WINDOWS       := # Nothing yet
 
+INCLUDE := -I src
 
-SRC_DIRS :=       \
-	src/arguments \
-	src/common    \
-	src/system    \
+DIR_ROOT    := build
+DIR_LINUX   := Linux
+DIR_WINDOWS := Windows
+DIR_DEBUG   := Debug
+DIR_RELEASE := Release
+DIR_OBJS    := .objs
 
-CXX_SRCS := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.cpp))
-CC_SRCS  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
+NAME_BASE := cpppp
 
-export _V_CXX_OBJS ?= $(addprefix $(_V_BUILD_DIR)/,$(subst .cpp,.obj,$(CXX_SRCS:src/%=%)))
-export _V_CC_OBJS  ?= $(addprefix $(_V_BUILD_DIR)/,$(subst .c,.o,$(CC_SRCS:src/%=%)))
+# LINUX
+ifneq ($(OS),Windows_NT)
+	export NAME          ?= $(NAME_BASE)
+	export BUILD_ARCH    ?= $(DIR_LINUX)
+	export DEBUG_FLAGS   ?= $(FLAGS_DEBUG_COMMON) $(FLAGS_DEBUG_LINUX)
+	export RELEASE_FLAGS ?= $(FLAGS_RELEASE_COMMON) $(FLAGS_RELEASE_LINUX)
+	export CXX_FLAGS     ?= $(FLAGS_CXX_COMMON) $(FLAGS_LINUX)
+	export CC_FLAGS      ?= $(FLAGS_CC_COMMON) $(FLAGS_LINUX)
+	export LD_FLAGS      ?= $(LDFLAGS_LINUX)
+	export CXX           ?= $(LINUX_CXX)
+	export CC            ?= $(LINUX_CC)
+else # WINDOWS
+	export NAME          ?= $(NAME_BASE).exe
+	export BUILD_ARCH    ?= $(DIR_WINDOWS)
+	export DEBUG_FLAGS   ?= $(FLAGS_DEBUG_COMMON) $(FLAGS_DEBUG_WINDOWS)
+	export RELEASE_FLAGS ?= $(FLAGS_RELEASE_COMMON) $(FLAGS_RELEASE_WINDOWS)
+	export CXX_FLAGS     ?= $(FLAGS_CXX_COMMON) $(FLAGS_WINDOWS)
+	export CC_FLAGS      ?= $(FLAGS_CC_COMMON) $(FLAGS_WINDOWS)
+	export LD_FLAGS      ?= $(LDFLAGS_WINDOWS)
+	export CXX           ?= $(WINDOWS_CXX)
+	export CC            ?= $(WINDOWS_CC)
+endif
 
+export BUILD_VERSION ?= $(DIR_RELEASE)
+export VERSION_FLAGS ?= $(RELEASE_FLAGS)
 
-# ANSI color code variables
-export RESET   ?= \\033[0m
-export BLACK   ?= \\033[30m
-export RED     ?= \\033[31m
-export GREEN   ?= \\033[32m
-export YELLOW  ?= \\033[33m
-export BLUE    ?= \\033[34m
-export MAGENTA ?= \\033[35m
-export CYAN    ?= \\033[36m
-export WHITE   ?= \\033[37m
-export DEFAULT ?= \\033[39m
+export BUILD_DIR  ?= $(DIR_ROOT)/$(BUILD_ARCH)/$(BUILD_VERSION)
+export BUILD_OBJS ?= $(BUILD_DIR)/$(DIR_OBJS)
 
-.PHONY: build build_dir sublime linux windows release debug clean
+VPATH := $(SRC_DIRS)
+
+SRC := src
+
+SRC_DIRS :=          \
+	$(SRC)/system    \
+	$(SRC)/arguments \
+
+CC_SRCS  := $(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.c))
+CXX_SRCS := $(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.cpp))
+
+export CC_OBJS  ?= $(addprefix $(BUILD_OBJS)/,$(subst .c,.o,$(CC_SRCS:$(SRC)/%=%)))
+export CXX_OBJS ?= $(addprefix $(BUILD_OBJS)/,$(subst .cpp,.obj,$(CXX_SRCS:$(SRC)/%=%)))
+
+export RESET   ?= \\x1b[0m
+export BLACK   ?= \\x1b[1;30m
+export RED     ?= \\x1b[1;31m
+export GREEN   ?= \\x1b[1;32m
+export YELLOW  ?= \\x1b[1;33m
+export BLUE    ?= \\x1b[1;34m
+export MAGENTA ?= \\x1b[1;35m
+export CYAN    ?= \\x1b[1;36m
+export WHITE   ?= \\x1b[1;37m
+export DEFAULT ?= \\x1b[1;39m
+
+.PHONY: build linux windows release debug build_dir clean
 
 build:
-	@ printf "::Compiling object files\n"
-	@ printf "::C++ Compiler - $(YELLOW)$(CXX)$(RESET)\n"
-	@ printf "::C++ Flags    - $(YELLOW)$(CXXFLAGS)$(RESET)\n"
-	@ printf "::C Compiler   - $(YELLOW)$(CC)$(RESET)\n"
-	@ printf "::C Flags      - $(YELLOW)$(CCFLAGS)$(RESET)\n"
+	@ printf "$(DEFAULT)::Architecture - $(BLUE)$(BUILD_ARCH)$(RESET)\n"
+	@ printf "$(DEFAULT)::Version - $(BLUE)$(BUILD_VERSION)$(RESET)\n"
+	@ printf "$(DEFAULT)::C Compiler - $(YELLOW)$(CC)$(RESET)\n"
+	@ printf "$(DEFAULT)::C++ Compiler - $(YELLOW)$(CXX)$(RESET)\n"
+	@ $(MAKE) -s $(CC_OBJS) $(CXX_OBJS)
+	@ $(MAKE) -s $(BUILD_DIR)/$(NAME)
+	@ printf "$(DEFAULT)::Program Location - $(GREEN)$(DIR_ROOT)/$(BUILD_ARCH)/$(BUILD_VERSION)/$(NAME)$(RESET)\n"
 
-	@ $(MAKE) -s $(_V_CC_OBJS) $(_V_CXX_OBJS)
+linux: ;@:
+	$(eval NAME          = $(NAME_BASE))
+	$(eval BUILD_ARCH    = $(DIR_LINUX))
+	$(eval DEBUG_FLAGS   ?= $(FLAGS_DEBUG_COMMON) $(FLAGS_DEBUG_LINUX))
+	$(eval RELEASE_FLAGS ?= $(FLAGS_RELEASE_COMMON) $(FLAGS_RELEASE_LINUX))
+	$(eval CXX_FLAGS     = $(FLAGS_CXX_COMMON) $(FLAGS_LINUX))
+	$(eval CC_FLAGS      = $(FLAGS_CC_COMMON) $(FLAGS_LINUX))
+	$(eval LD_FLAGS      = $(LDFLAGS_LINUX))
+	$(eval CXX           = $(LINUX_CXX))
+	$(eval CC            = $(LINUX_CC))
 
-	@ printf "::Linking program\n"
-	@ printf "::Output directory - $(YELLOW)$(_V_BUILD_DIR)$(RESET)\n"
-	@ printf "::Program name     - $(YELLOW)$(_V_NAME)$(RESET)\n"
+windows: ;@:
+	$(eval NAME          = $(NAME_BASE).exe)
+	$(eval BUILD_ARCH    = $(DIR_WINDOWS))
+	$(eval DEBUG_FLAGS   ?= $(FLAGS_DEBUG_COMMON) $(FLAGS_DEBUG_WINDOWS))
+	$(eval RELEASE_FLAGS ?= $(FLAGS_RELEASE_COMMON) $(FLAGS_RELEASE_WINDOWS))
+	$(eval CXX_FLAGS     = $(FLAGS_CXX_COMMON) $(FLAGS_WINDOWS))
+	$(eval CC_FLAGS      = $(FLAGS_CC_COMMON) $(FLAGS_WINDOWS))
+	$(eval LD_FLAGS      = $(LDFLAGS_WINDOWS))
+	$(eval CXX           = $(WINDOWS_CXX))
+	$(eval CC            = $(WINDOWS_CC))
 
-	@ $(MAKE) -s $(_V_BUILD_DIR)/$(_V_NAME)
+release: ;@:
+	$(eval VERSION_FLAGS ?= $(RELEASE_FLAGS))
+	$(eval BUILD_VERSION = $(DIR_RELEASE))
+
+debug: ;@:
+	$(eval VERSION_FLAGS ?= $(DEBUG_FLAGS))
+	$(eval BUILD_VERSION = $(DIR_DEBUG))
 
 build_dir:
-	@ -mkdir -p $(_V_BUILD_DIR)
-
-# This target is for disabling the ANSI colors.
-# It's called 'sublime' bc Sublime Text's output panel doesn't support ANSI colors natively (hence why this exists).
-sublime:
-	$(eval RESET   := "")
-	$(eval BLACK   := "")
-	$(eval RED     := "")
-	$(eval GREEN   := "")
-	$(eval YELLOW  := "")
-	$(eval BLUE    := "")
-	$(eval MAGENTA := "")
-	$(eval CYAN    := "")
-	$(eval WHITE   := "")
-	$(eval DEFAULT := "")
-	@ printf "::Disabled colored output\n"
-
-linux:
-	$(eval _V_NAME        := $(_V_NAME_BASE))
-	$(eval _V_BUILD_PLAT  := $(_V_BUILD_PATH_LINUX))
-	$(eval _V_DEBUG_FLAGS := $(_V_COMMON_DEBUG_FLAGS) $(_V_LINUX_DEBUG_FLAGS))
-	$(eval CXX            := $(_V_LINUX_CXX))
-	$(eval CC             := $(_V_LINUX_CC))
-	$(eval CXXFLAGS       := $(_V_COMMON_FLAGS) $(_V_VERSION_FLAGS) $(_V_CXX_STD_FLAG) $(_V_LINUX_FLAGS))
-	$(eval CCFLAGS        := $(_V_COMMON_FLAGS) $(_V_VERSION_FLAGS) $(_V_LINUX_FLAGS))
-	@ printf "::Architecture - Linux\n"
-
-windows:
-	$(eval _V_NAME        := $(_V_NAME_BASE).exe)
-	$(eval _V_BUILD_PLAT  := $(_V_BUILD_PATH_WINDOWS))
-	$(eval _V_DEBUG_FLAGS := $(_V_COMMON_DEBUG_FLAGS) $(_V_WINDOWS_DEBUG_FLAGS))
-	$(eval CXX            := $(_V_WINDOWS_CXX))
-	$(eval CC             := $(_V_WINDOWS_CC))
-	$(eval CXXFLAGS       := $(_V_COMMON_FLAGS) $(_V_VERSION_FLAGS) $(_V_CXX_STD_FLAG))
-	$(eval CCFLAGS        := $(_V_COMMON_FLAGS) $(_V_VERSION_FLAGS))
-	@ printf "::Architecture - Windows\n"
-
-debug:
-	$(eval _V_VERSION_FLAGS := $(_V_DEBUG_FLAGS))
-	$(eval _V_BUILD_VER     := $(_V_BUILD_PATH_DEBUG))
-	@ printf "::Version - Debug\n"
-
-release:
-	$(eval _V_VERSION_FLAGS := $(_V_RELEASE_FLAGS))
-	$(eval _V_BUILD_VER     := $(_V_BUILD_PATH_RELEASE))
-	@ printf "::Version - Release\n"
-
-$(_V_BUILD_DIR)/$(_V_NAME):
-	@ printf "::Linking $(CYAN)$@$(RESET)\n"
-	clang++ $(CXXFLAGS) $(INCLUDE) $(_V_CC_OBJS) $(_V_CXX_OBJS) -o $@
-
-$(_V_BUILD_DIR)/%.o: src/%.c | build_dir
-	@ printf "::Compiling $< -> $(CYAN)$@$(RESET)\n"
-	@ -mkdir -p $(dir $@)
-	@ $(CC) $(CCFLAGS) $(INCLUDE) -c $< -o $@
-
-$(_V_BUILD_DIR)/%.obj: src/%.cpp | build_dir
-	@ printf "::Compiling $< -> $(CYAN)$@$(RESET)\n"
-	@ -mkdir -p $(dir $@)
-	@ $(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
-
-
-# For when I implement different types of cleaning
-define clean_with_message
-	@ if [ -d $(1) ]; then printf "\n::Deleted $(RED)$(1)$(RESET)\n"; fi
-	@ -rm -rf $(1)
-endef
+	@ -mkdir -p $(BUILD_DIR) $(BUILD_OBJS)
 
 clean:
-	$(call clean_with_message,$(_V_BUILD_ROOT))
+	@ -rm -rf $(DIR_ROOT)
+	@ printf "::Cleaned $(RED)$(DIR_ROOT)/$(RESET)\n"
+
+$(BUILD_OBJS)/%.obj: $(SRC)/%.cpp | build_dir
+	@ printf "::Compiling $(BLUE)$@$(RESET)\n"
+	@ -mkdir -p $(dir $@)
+	$(CXX) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@
+
+$(BUILD_OBJS)/%.o: $(SRC)/%.c | build_dir
+	@ printf "::Compiling $(BLUE)$@$(RESET)\n"
+	@ -mkdir -p $(dir $@)
+	$(CC) $(CC_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@
+
+$(BUILD_DIR)/$(NAME):
+	@ printf "::Linking $(CYAN)$@$(RESET)\n"
+	$(CXX) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) $(CC_OBJS) $(CXX_OBJS) -o $@ $(LD_FLAGS)
