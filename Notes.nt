@@ -4,3 +4,22 @@ I want to practice my programming by writing a C++ package manager... in C++. Wh
 Ooh, NOTE TO SELF: I could automate my Makefile setup (and kinda really want to). That could also be a prt of this project as it'll probably be invoking GNU make under the hood (altho, I could just manually call compilers and shit myself... oooh...).
 
 Finally fucking finished the build system and the project structure. On god, this is all just validating the project's existence: ~4hrs spent on setup alone.
+
+[07/22/25]
+Coming back to this project; I think I finally have a really good solid idea for how I want to structure my Makefiles. At least 90%. I might change how the "selection" process works, but the main idea for this "build system" program is that I don't want to have to use the program to build my projects, I just want it to generate Makefiles for me.
+
+I want to have options for:
+    - compiler choice
+    - cross compatibility
+    - building as a library
+    - colored output
+    - versioning
+    - running other, user-created Makefiles
+    - 'clean' variations (like a dirty clean)
+    - various flag-related options
+        - common debug flags
+            - architecture-specific flags
+        - C++ vs C specific flags
+            - architecture-specific flags
+
+I also want default options for all of these; the default option will be my personal preference.
