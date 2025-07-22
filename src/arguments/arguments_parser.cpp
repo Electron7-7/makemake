@@ -1,5 +1,5 @@
 #include "arguments_parser.hpp"
-#include "common/printouts.hpp"
+#include "common/labels.hpp"
 
 ArgumentsParser static_ArgumentsParser;
 ArgumentsParser* global_ArgumentsParser = &static_ArgumentsParser;
@@ -82,7 +82,7 @@ ErrorCode ArgumentsParser::ParseArguments(int argc, char** argv)
     {
         if(!_contains(_options, option))
         {
-            PRINTERR("ArgumentsParser::ParseArguments - A mandatory option is missing!");
+            printf("%sArgumentsParser::ParseArguments - A mandatory option is missing!\n", ERROR);
             return Err::Args::MANDATORY_OPTION_MISSING;
         }
     }

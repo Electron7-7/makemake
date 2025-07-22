@@ -1,6 +1,6 @@
 #include "argument_handlers.hpp"
 #include "arguments/arguments.hpp"
-#include "common/printouts.hpp"
+#include "common/labels.hpp"
 
 ErrorCode OptionsHandler(std::vector<Option>* options)
 {
@@ -10,7 +10,7 @@ ErrorCode OptionsHandler(std::vector<Option>* options)
         {
             if(!option.HasValue())
             {
-                PRINTERR("OptionsHandler - Option [" + option.ShortName() + ", " + option.LongName() + "] is missing its mandatory required value");
+                printf("%sOptionsHandler - Option [%s, %s] is missing its mandatory required value\n", ERROR, option.ShortName(), option.LongName());
                 return Err::Args::MANDATORY_INPUT_MISSING;
             }
 
@@ -19,7 +19,7 @@ ErrorCode OptionsHandler(std::vector<Option>* options)
 
         if(option == Options::DebugPrint)
         {
-            PRINT("DebugPrint: " + option.GetValue());
+            printf("%sDebugPrint: %s\n", DEBUG, option.GetValue());
             continue;
         }
     }
@@ -33,13 +33,13 @@ ErrorCode FlagsHandler(std::vector<Flag>* flags)
     {
         if(flag == Flags::Help)
         {
-            PRINT(_Help_Printout);
+            printf("%s\n    %s\n", _Help_Printout, _Version_Printout);
             continue;
         }
 
         if(flag == Flags::Version)
         {
-            PRINT(_Version_Printout);
+            printf("    %s\n", _Version_Printout);
             continue;
         }
     }
