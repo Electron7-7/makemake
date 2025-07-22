@@ -1,11 +1,7 @@
-#ifndef COMMON_MACROS_H
-#define COMMON_MACROS_H
+#ifndef MACROS_H
+#define MACROS_H
 
-// Forward declaration macro
-#ifdef COMPILER_FORWARD_DECLARATIONS
+// This macro is just to make forward declarations more obvious
 #define FORWARD_DECLARE(forward_declaration) forward_declaration
-#else
-#define FORWARD_DECLARE(forward_declaration)
-#endif // COMPILER_FORWARD_DECLARATIONS
 
-#endif // COMMON_MACROS_H
+#endif // MACROS_H
