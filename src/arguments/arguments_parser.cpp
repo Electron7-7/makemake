@@ -82,7 +82,7 @@ ErrCode ArgumentsParser::ParseArguments(int argc, char** argv)
         if(!_contains(_options, option))
         {
             printf("%s ArgumentsParser::ParseArguments - A mandatory option is missing!%s\n", ERROR, COLOR_RESET);
-            return Err::Args::MANDATORY_OPTION_MISSING;
+            return Err::Args::MANDATORY_ARGUMENT_OPTION_MISSING;
         }
     }
 
