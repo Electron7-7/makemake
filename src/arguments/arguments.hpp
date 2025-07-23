@@ -18,7 +18,7 @@ namespace Options
 
 constexpr const char* _Help_Printout =
 
-R"~(    Usage: cpppp [-hvn] [--no-color] [-s|--source <source_code_dir>] [-p|--name <program_name>]
+R"~(    Usage: makemake [-hvn] [--no-color] [-s|--source <source_code_dir>] [-p|--name <program_name>]
         -h, --help              print help document
         -v, --version           print program version
         -n, --dry-run           print the generated Makefile instead of creating/replacing it
@@ -26,7 +26,7 @@ R"~(    Usage: cpppp [-hvn] [--no-color] [-s|--source <source_code_dir>] [-p|--n
         -p, --name NAME         set the name of the final binary (defaults to the name of the current directory)
 )~";
 
-constexpr const char* _Version_Printout = "cpppp v0.0.1";
+constexpr const char* _Version_Printout = "makemake v0.0.1";
 
 inline std::string source_directory = "src";
 inline std::string program_name = "";
