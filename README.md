@@ -36,3 +36,6 @@ Well, the nature of how the Makefile works causes some issues. How the makefile 
 
 ## What's planned for MakeMake?
 I want MakeMake to eventually be able to edit these types of Makefiles, to make changing the build system easier. As I said before, one of the caveats to this build system is that it can be a little tedious to make new build targets if you want to be really anal about it. Having MakeMake do that work for you would be really handy and is a feature I want to work on asap.
+
+## Building MakeMake
+To build MakeMake, just run `make`. Your architecture *should* be detected automatically, but if it isn't you can always run either `make linux build` or `make windows build` if need be. If something goes wrong... it's probably just the compiler. To compile this on Windows, you'll need to use MSYS2 (or the Windows versions of the GNU build tools by themselves if you're a madman). Just run `make` or `make windows build` in MSYS2 and you should get a nice, fresh exe.
