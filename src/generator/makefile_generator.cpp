@@ -1,6 +1,6 @@
-#include "prototype_makefile_generator.hpp"
+#include "makefile_generator.hpp"
 #include "arguments/arguments.hpp"
-#include "makefile_template.hpp"
+#include "makefile/default_makefile.hpp"
 #include <filesystem>
 #include <set>
 
@@ -10,31 +10,31 @@ int number_of_indent_spaces = 4;
 
 std::string prototype_GetProgramName()
 {
-    if(!program_name.empty())
-        return program_name;
+    if(!global_ProgramName.empty())
+        return global_ProgramName;
 
-    return std::filesystem::current_path().stem();
+    return std::filesystem::current_path().stem().generic_string();
 }
 
-ErrCode prototype_GetSourceDirectories(const std::string& source_directory)
+ErrCode GetSourceDirectories()
 {
     std::set<std::string> valid_directories = {};
     std::string longest_string = "";
     std::string src_dirs_variable("SRC_DIRS :=");
 
-    if(!std::filesystem::is_directory(source_directory))
+    if(!std::filesystem::is_directory(global_SourceCodeDirectory))
         return Err::Generator::SOURCE_DIR_INVALID;
 
-    for(const auto& entry : std::filesystem::recursive_directory_iterator(source_directory))
+    for(const auto& entry : std::filesystem::recursive_directory_iterator(global_SourceCodeDirectory))
     {
         if(entry.is_regular_file() && (entry.path().extension() == ".cpp" || entry.path().extension() == ".c"))
         {
-            std::string valid_directory = entry.path().relative_path().remove_filename();
+            std::string valid_directory = entry.path().relative_path().remove_filename().generic_string();
 
-            std::string truncated_directory = valid_directory.substr(source_directory.size() + 1);
+            std::string truncated_directory = valid_directory.substr(global_SourceCodeDirectory.size() + 1);
             std::string final_directory = "$(SRC)/" + truncated_directory.substr(0, truncated_directory.size() - 1);
 
-            if(!valid_directory.compare(source_directory + "/"))
+            if(!valid_directory.compare(global_SourceCodeDirectory + "/"))
                 final_directory.erase(final_directory.size() - 1);
 
             valid_directories.insert(final_directory);
@@ -62,7 +62,7 @@ ErrCode prototype_GetSourceDirectories(const std::string& source_directory)
     return Err::NO_ERROR;
 }
 
-SafeReturn<std::string> prototype_GenerateDefaultMakefile(const std::string& source_directory)
+SafeReturn<std::string> GenerateDefaultMakefile()
 {
     std::string makefile = "";
 
@@ -159,13 +159,13 @@ SafeReturn<std::string> prototype_GenerateDefaultMakefile(const std::string& sou
 
     makefile += "\n";
 
-    makefile += make_variable_t("SRC", source_directory.c_str(), " := ").GetLine();
+    makefile += make_variable_t("SRC", global_SourceCodeDirectory.c_str(), " := ").GetLine();
 
     makefile += "\n";
 
-    ErrCode source_directory_return_value = prototype_GetSourceDirectories(source_directory);
-    if(source_directory_return_value != Err::NO_ERROR)
-        return SafeReturn<std::string>("", source_directory_return_value);
+    ErrCode global_SourceCodeDirectory_return_value = GetSourceDirectories();
+    if(global_SourceCodeDirectory_return_value != Err::NO_ERROR)
+        return SafeReturn<std::string>("", global_SourceCodeDirectory_return_value);
 
     makefile += make_variable_t("SRC_DIRS", source_directories.c_str(), pretty_source_dirs_equal_sign.c_str()).GetLine();
 

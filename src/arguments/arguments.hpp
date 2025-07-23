@@ -20,7 +20,7 @@ namespace Options
 
 constexpr const char* _Help_Printout =
 
-R"~(    Usage: makemake [-hvn] [--no-color] [-s|--source <source_code_dir>] [-p|--name <program_name>]
+R"~(    Usage: makemake [-hvn] [--no-color] [-s|--source <source_code_dir>] [-p|--name <global_ProgramName>]
         -h, --help              print help document
         -v, --version           print program version
         -n, --dry-run           print the generated Makefile instead of creating/replacing it
@@ -30,9 +30,9 @@ R"~(    Usage: makemake [-hvn] [--no-color] [-s|--source <source_code_dir>] [-p|
 
 constexpr const char* _Version_Printout = "makemake v0.0.1";
 
-inline std::string source_directory = "src";
-inline std::string program_name = "";
-inline bool _debug_no_printout = false;
-inline bool dry_run = false;
+inline std::string global_SourceCodeDirectory = "src";
+inline std::string global_ProgramName = "";
+inline bool global_DryRun = false;
+inline bool _global_DebugNoPrintOut = false;
 
 #endif // ARGUMENTS_H

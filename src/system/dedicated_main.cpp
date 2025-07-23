@@ -2,7 +2,7 @@
 #include "arguments/arguments_parser.hpp"
 #include "argument_handlers.hpp"
 #include "common/labels.hpp"
-#include "prototype_makefile_generator.hpp"
+#include "generator/makefile_generator.hpp"
 #include <filesystem>
 #include <fstream>
 
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
     if(unsigned short return_value = OptionsHandler(global_ArgumentsParser->GetOptions()) != Err::NO_ERROR)
         return return_value;
 
-    SafeReturn<std::string> try_GetMakefile = prototype_GenerateDefaultMakefile(source_directory);
+    SafeReturn<std::string> try_GetMakefile = GenerateDefaultMakefile();
     ErrCode error_code = try_GetMakefile.ErrorCode();
 
     if(error_code != Err::NO_ERROR)
@@ -44,10 +44,10 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    if(dry_run)
+    if(global_DryRun)
     {
-        if(!_debug_no_printout)
-            printf("%sGenerated Makefile:%s\n%s\n", COLOR_BOLD(GREEN), COLOR_RESET, try_GetMakefile.Data().c_str());
+        if(!_global_DebugNoPrintOut)
+            printf("%s\n", try_GetMakefile.Data().c_str());
         return 0;
     }
 
