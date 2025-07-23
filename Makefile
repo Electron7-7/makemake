@@ -1,12 +1,12 @@
 LINUX_CXX := clang++
 LINUX_CC  := clang
 
-ifeq ($(OS),Windows_NT)
-	WINDOWS_CXX := g++
-	WINDOWS_CC  := gcc
-else
+ifneq ($(OS),Windows_NT)
 	WINDOWS_CXX := x86_64-w64-mingw32-g++
 	WINDOWS_CC  := x86_64-w64-mingw32-gcc
+else
+	WINDOWS_CXX := g++
+	WINDOWS_CC  := gcc
 endif
 
 FLAGS_DEBUG_COMMON    := -g -Wall -O0 -D DEBUGGING
@@ -67,8 +67,9 @@ VPATH := $(SRC_DIRS)
 SRC := src
 
 SRC_DIRS :=          \
+	$(SRC)           \
 	$(SRC)/system    \
-	$(SRC)/arguments \
+	$(SRC)/arguments
 
 CC_SRCS  := $(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.c))
 CXX_SRCS := $(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.cpp))
@@ -87,7 +88,7 @@ export CYAN    ?= \\x1b[1;36m
 export WHITE   ?= \\x1b[1;37m
 export DEFAULT ?= \\x1b[1;39m
 
-.PHONY: build linux windows release debug build_dir clean
+.PHONY: build linux windows release debug build_dir clean disable_colors
 
 build:
 	@ printf "$(DEFAULT)::Architecture - $(BLUE)$(BUILD_ARCH)$(RESET)\n"
@@ -135,6 +136,19 @@ clean:
 	@ -rm -rf $(DIR_ROOT)
 	@ printf "::Cleaned $(RED)$(DIR_ROOT)/$(RESET)\n"
 
+disable_colors:
+	$(eval RESET   := "")
+	$(eval BLACK   := "")
+	$(eval RED     := "")
+	$(eval GREEN   := "")
+	$(eval YELLOW  := "")
+	$(eval BLUE    := "")
+	$(eval MAGENTA := "")
+	$(eval CYAN    := "")
+	$(eval WHITE   := "")
+	$(eval DEFAULT := "")
+	@ printf "::Output colors disabled\n"
+
 $(BUILD_OBJS)/%.obj: $(SRC)/%.cpp | build_dir
 	@ printf "::Compiling $(BLUE)$@$(RESET)\n"
 	@ -mkdir -p $(dir $@)
@@ -148,3 +162,4 @@ $(BUILD_OBJS)/%.o: $(SRC)/%.c | build_dir
 $(BUILD_DIR)/$(NAME):
 	@ printf "::Linking $(CYAN)$@$(RESET)\n"
 	$(CXX) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) $(CC_OBJS) $(CXX_OBJS) -o $@ $(LD_FLAGS)
+
