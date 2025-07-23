@@ -42,8 +42,8 @@ ifneq ($(OS),Windows_NT)
 	export CXX_FLAGS     ?= $(FLAGS_CXX_COMMON) $(FLAGS_LINUX)
 	export CC_FLAGS      ?= $(FLAGS_CC_COMMON) $(FLAGS_LINUX)
 	export LD_FLAGS      ?= $(LDFLAGS_LINUX)
-	export CXX           ?= $(LINUX_CXX)
-	export CC            ?= $(LINUX_CC)
+	export CXX_COMPILER  ?= $(LINUX_CXX)
+	export C_COMPILER    ?= $(LINUX_CC)
 else # WINDOWS
 	export NAME          ?= $(NAME_BASE).exe
 	export BUILD_ARCH    ?= $(DIR_WINDOWS)
@@ -52,8 +52,8 @@ else # WINDOWS
 	export CXX_FLAGS     ?= $(FLAGS_CXX_COMMON) $(FLAGS_WINDOWS)
 	export CC_FLAGS      ?= $(FLAGS_CC_COMMON) $(FLAGS_WINDOWS)
 	export LD_FLAGS      ?= $(LDFLAGS_WINDOWS)
-	export CXX           ?= $(WINDOWS_CXX)
-	export CC            ?= $(WINDOWS_CC)
+	export CXX_COMPILER  ?= $(WINDOWS_CXX)
+	export C_COMPILER    ?= $(WINDOWS_CC)
 endif
 
 export BUILD_VERSION ?= $(DIR_RELEASE)
@@ -94,8 +94,8 @@ export DEFAULT ?= \\x1b[1;39m
 build:
 	@ printf "$(DEFAULT)::Architecture - $(BLUE)$(BUILD_ARCH)$(RESET)\n"
 	@ printf "$(DEFAULT)::Version - $(BLUE)$(BUILD_VERSION)$(RESET)\n"
-	@ printf "$(DEFAULT)::C Compiler - $(YELLOW)$(CC)$(RESET)\n"
-	@ printf "$(DEFAULT)::C++ Compiler - $(YELLOW)$(CXX)$(RESET)\n"
+	@ printf "$(DEFAULT)::C Compiler - $(YELLOW)$(C_COMPILER)$(RESET)\n"
+	@ printf "$(DEFAULT)::C++ Compiler - $(YELLOW)$(CXX_COMPILER)$(RESET)\n"
 	@ $(MAKE) -s $(CC_OBJS) $(CXX_OBJS)
 	@ $(MAKE) -s $(BUILD_DIR)/$(NAME)
 	@ printf "$(DEFAULT)::Program Location - $(GREEN)$(DIR_ROOT)/$(BUILD_ARCH)/$(BUILD_VERSION)/$(NAME)$(RESET)\n"
@@ -108,8 +108,8 @@ linux: ;@:
 	$(eval CXX_FLAGS     = $(FLAGS_CXX_COMMON) $(FLAGS_LINUX))
 	$(eval CC_FLAGS      = $(FLAGS_CC_COMMON) $(FLAGS_LINUX))
 	$(eval LD_FLAGS      = $(LDFLAGS_LINUX))
-	$(eval CXX           = $(LINUX_CXX))
-	$(eval CC            = $(LINUX_CC))
+	$(eval CXX_COMPILER  = $(LINUX_CXX))
+	$(eval C_COMPILER    = $(LINUX_CC))
 
 windows: ;@:
 	$(eval NAME          = $(NAME_BASE).exe)
@@ -119,8 +119,8 @@ windows: ;@:
 	$(eval CXX_FLAGS     = $(FLAGS_CXX_COMMON) $(FLAGS_WINDOWS))
 	$(eval CC_FLAGS      = $(FLAGS_CC_COMMON) $(FLAGS_WINDOWS))
 	$(eval LD_FLAGS      = $(LDFLAGS_WINDOWS))
-	$(eval CXX           = $(WINDOWS_CXX))
-	$(eval CC            = $(WINDOWS_CC))
+	$(eval CXX_COMPILER  = $(WINDOWS_CXX))
+	$(eval C_COMPILER    = $(WINDOWS_CC))
 
 release: ;@:
 	$(eval VERSION_FLAGS ?= $(RELEASE_FLAGS))
@@ -153,14 +153,14 @@ disable_colors:
 $(BUILD_OBJS)/%.obj: $(SRC)/%.cpp | build_dir
 	@ printf "::Compiling $(BLUE)$@$(RESET)\n"
 	@ -mkdir -p $(dir $@)
-	$(CXX) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@
+	$(CXX_COMPILER) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@
 
 $(BUILD_OBJS)/%.o: $(SRC)/%.c | build_dir
 	@ printf "::Compiling $(BLUE)$@$(RESET)\n"
 	@ -mkdir -p $(dir $@)
-	$(CC) $(CC_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@
+	$(C_COMPILER) $(CC_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@
 
 $(BUILD_DIR)/$(NAME):
 	@ printf "::Linking $(CYAN)$@$(RESET)\n"
-	$(CXX) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) $(CC_OBJS) $(CXX_OBJS) -o $@ $(LD_FLAGS)
+	$(CXX_COMPILER) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) $(CC_OBJS) $(CXX_OBJS) -o $@ $(LD_FLAGS)
 
