@@ -14,7 +14,17 @@ public:
     constexpr const char* LongName()  const { return _long_name;  }
     constexpr const char* ShortName() const { return _short_name; }
 
-    constexpr bool operator==(const _Arg& other) const { return (CompareStrings(_long_name, other._long_name) || CompareStrings(_short_name, other._short_name)); }
+    constexpr bool operator==(const _Arg& other) const
+    {
+        if(std::string(_short_name).empty() || std::string(other._short_name).empty())
+            return CompareStrings(_long_name, other._long_name);
+
+        if(std::string(_long_name).empty() || std::string(other._long_name).empty())
+            return CompareStrings(_short_name, other._short_name);
+
+        return (CompareStrings(_long_name, other._long_name) || CompareStrings(_short_name, other._short_name));
+    }
+
     constexpr bool operator!=(const _Arg& other) const { return !(*this == other);   }
 
 protected:
