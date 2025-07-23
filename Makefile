@@ -31,7 +31,7 @@ DIR_DEBUG   := Debug
 DIR_RELEASE := Release
 DIR_OBJS    := .objs
 
-NAME_BASE := cpppp
+NAME_BASE := makemake
 
 # LINUX
 ifneq ($(OS),Windows_NT)
