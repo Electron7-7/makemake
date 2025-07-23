@@ -9,13 +9,13 @@ namespace Err
 
     namespace Args
     {
-        constexpr unsigned short MANDATORY_OPTION_MISSING = 0x1; // i.e: a missing flag or command line option
-        constexpr unsigned short MANDATORY_INPUT_MISSING  = 0x2; // i.e: a missing input file
+        constexpr unsigned short ARGUMENT_OPTION_MISSING = 0x1; // An 'option' argument flag is missing its option
+        constexpr unsigned short MANDATORY_ARGUMENT_OPTION_MISSING = 0x2; // A mandatory 'option' argument flag is missing its option
     }
 
     namespace Generator
     {
-        constexpr unsigned short SOURCE_DIR_INVALID = 0x3;
+        constexpr unsigned short SOURCE_DIR_INVALID = 0x2;
     }
 }
 

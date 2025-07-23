@@ -11,7 +11,6 @@ ErrCode OptionsHandler(std::vector<Option>* options)
             if(!option.HasValue())
             {
                 printf("%s OptionsHandler - Option [%s, %s] is missing its mandatory required value\n%s", ERROR, option.ShortName(), option.LongName(), COLOR_RESET);
-                return Err::Args::MANDATORY_INPUT_MISSING;
             }
 
             source_directory = option.GetValue();
@@ -23,7 +22,6 @@ ErrCode OptionsHandler(std::vector<Option>* options)
             if(!option.HasValue())
             {
                 printf("%s OptionsHandler - Option [%s, %s] is missing its mandatory required value\n%s", ERROR, option.ShortName(), option.LongName(), COLOR_RESET);
-                return Err::Args::MANDATORY_INPUT_MISSING;
             }
 
             program_name = option.GetValue();
