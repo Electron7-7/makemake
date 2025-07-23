@@ -10,9 +10,6 @@ std::vector<Option> ArgumentsParser::_valid_options = {};
 std::vector<Flag> ArgumentsParser::_valid_flags = {};
 std::vector<Option> ArgumentsParser::_mandatory_options = {};
 
-std::string source_directory = "";
-
-
 bool _contains(std::vector<Option>& options, const Option& option)
 {
     for(Option& _option : options)
@@ -55,7 +52,7 @@ std::vector<Option>* ArgumentsParser::GetOptions()
 std::vector<Flag>* ArgumentsParser::GetFlags()
 { return &_flags; }
 
-ErrorCode ArgumentsParser::ParseArguments(int argc, char** argv)
+ErrCode ArgumentsParser::ParseArguments(int argc, char** argv)
 {
     for(unsigned int i = 1 ; i < argc ; i++)
     {
@@ -78,8 +75,6 @@ ErrorCode ArgumentsParser::ParseArguments(int argc, char** argv)
                 continue;
             }
         }
-
-        source_directory = argv[i];
     }
 
     for(const Option& option : _mandatory_options)

@@ -5,7 +5,7 @@
 #include "arguments/argument.hpp"
 #include <vector>
 
-ErrorCode OptionsHandler(std::vector<Option>* Options);
-ErrorCode FlagsHandler(std::vector<Flag>* Flags);
+ErrCode OptionsHandler(std::vector<Option>* Options);
+ErrCode FlagsHandler(std::vector<Flag>* Flags);
 
 #endif // ARGUMENT_HANDLERS_H

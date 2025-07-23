@@ -11,8 +11,8 @@ namespace Flags
 
 namespace Options
 {
-    const Option DebugPrint       ("--debug-print", "-d");
-    const Option GenerateMakefile ("--makefile", "-m");
+    const Option SourceDirectory ("--source", "-s");
+    const Option ProgramName     ("--name", "-n");
 }
 
 constexpr const char* _Help_Printout =
@@ -23,5 +23,8 @@ R"~(    Usage: cpppp [-hv]
 )~";
 
 constexpr const char* _Version_Printout = "cpppp v0.0.1";
+
+inline std::string source_directory = "src";
+inline std::string program_name = "";
 
 #endif // ARGUMENTS_H
