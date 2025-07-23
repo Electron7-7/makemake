@@ -12,6 +12,7 @@ int main(int argc, char** argv)
     global_ArgumentsParser->AddFlag(Flags::Help);
     global_ArgumentsParser->AddFlag(Flags::Version);
     global_ArgumentsParser->AddFlag(Flags::DryRun);
+    global_ArgumentsParser->AddFlag(Flags::debug_NoPrintout);
 
     // Add valid options
     global_ArgumentsParser->AddOption(Options::SourceDirectory);
@@ -45,7 +46,8 @@ int main(int argc, char** argv)
 
     if(dry_run)
     {
-        printf("%sGenerated Makefile:%s\n%s\n", COLOR_BOLD(GREEN), COLOR_RESET, try_GetMakefile.Data().c_str());
+        if(!_debug_no_printout)
+            printf("%sGenerated Makefile:%s\n%s\n", COLOR_BOLD(GREEN), COLOR_RESET, try_GetMakefile.Data().c_str());
         return 0;
     }
 

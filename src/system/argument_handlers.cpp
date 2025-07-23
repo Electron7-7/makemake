@@ -70,6 +70,12 @@ ErrCode FlagsHandler(std::vector<Flag>* flags)
             dry_run = true;
             continue;
         }
+
+        if(flag == Flags::debug_NoPrintout)
+        {
+            _debug_no_printout = true;
+            continue;
+        }
     }
 
     return Err::NO_ERROR;

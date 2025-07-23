@@ -8,6 +8,8 @@ namespace Flags
     const Flag Help     ("--help", "-h");
     const Flag Version  ("--version", "-v");
     const Flag DryRun   ("--dry-run", "-n");
+
+    const Flag debug_NoPrintout ("--no-printout", "");
 }
 
 namespace Options
@@ -30,6 +32,7 @@ constexpr const char* _Version_Printout = "makemake v0.0.1";
 
 inline std::string source_directory = "src";
 inline std::string program_name = "";
+inline bool _debug_no_printout = false;
 inline bool dry_run = false;
 
 #endif // ARGUMENTS_H
