@@ -12,7 +12,7 @@ public:
     static void AddFlag(const Flag& Flag);
     static std::vector<Option>* GetOptions();
     static std::vector<Flag>* GetFlags();
-    static ErrorCode ParseArguments(int NumberOfArguments, char** Arguments);
+    static ErrCode ParseArguments(int NumberOfArguments, char** Arguments);
 
 private:
     static std::vector<Option> _options;
@@ -25,6 +25,5 @@ private:
 };
 
 extern ArgumentsParser* global_ArgumentsParser;
-extern std::string source_directory;
 
 #endif // ARGUMENTS_PARSER_H

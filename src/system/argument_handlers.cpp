@@ -2,24 +2,31 @@
 #include "arguments/arguments.hpp"
 #include "common/labels.hpp"
 
-ErrorCode OptionsHandler(std::vector<Option>* options)
+ErrCode OptionsHandler(std::vector<Option>* options)
 {
     for(const Option& option : *options)
     {
-        if(option == Options::GenerateMakefile)
+        if(option == Options::SourceDirectory)
         {
             if(!option.HasValue())
             {
-                printf("%sOptionsHandler - Option [%s, %s] is missing its mandatory required value\n", ERROR, option.ShortName(), option.LongName());
+                printf("%s OptionsHandler - Option [%s, %s] is missing its mandatory required value\n%s", ERROR, option.ShortName(), option.LongName(), COLOR_RESET);
                 return Err::Args::MANDATORY_INPUT_MISSING;
             }
 
+            source_directory = option.GetValue();
             continue;
         }
 
-        if(option == Options::DebugPrint)
+        if(option == Options::ProgramName)
         {
-            printf("%sDebugPrint: %s\n", DEBUG, option.GetValue());
+            if(!option.HasValue())
+            {
+                printf("%s OptionsHandler - Option [%s, %s] is missing its mandatory required value\n%s", ERROR, option.ShortName(), option.LongName(), COLOR_RESET);
+                return Err::Args::MANDATORY_INPUT_MISSING;
+            }
+
+            program_name = option.GetValue();
             continue;
         }
     }
@@ -27,7 +34,7 @@ ErrorCode OptionsHandler(std::vector<Option>* options)
     return Err::NO_ERROR;
 }
 
-ErrorCode FlagsHandler(std::vector<Flag>* flags)
+ErrCode FlagsHandler(std::vector<Flag>* flags)
 {
     for(const Flag& flag : *flags)
     {
