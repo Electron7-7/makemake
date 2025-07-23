@@ -95,8 +95,6 @@ namespace MakeVariables
     static make_variable_t DIR_RELEASE = { "DIR_RELEASE" , "Release" , " := "    };
     static make_variable_t DIR_OBJS    = { "DIR_OBJS"    , ".objs"   , "    := " };
 
-    static make_variable_t NAME_BASE = { "NAME_BASE", "cpppp", " := " };
-
     namespace IfOnLinux
     {
         static make_variable_t EXPORT_NAME            = { "NAME"            , "$(NAME_BASE)"                                   , "          ?= "   , true };
