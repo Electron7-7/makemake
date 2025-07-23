@@ -94,17 +94,16 @@ export DEFAULT ?= \\x1b[1;39m
 build:
 	@ printf "$(DEFAULT)::Architecture - $(BLUE)$(BUILD_ARCH)$(RESET)\n"
 	@ printf "$(DEFAULT)::Version - $(BLUE)$(BUILD_VERSION)$(RESET)\n"
-	@ printf "$(DEFAULT)::C Compiler - $(YELLOW)$(C_COMPILER)$(RESET)\n"
-	@ printf "$(DEFAULT)::C++ Compiler - $(YELLOW)$(CXX_COMPILER)$(RESET)\n"
-	@ $(MAKE) -s $(CC_OBJS) $(CXX_OBJS)
+	@ printf "$(DEFAULT)::C Compile Command - $(YELLOW)$(C_COMPILER) $(CC_FLAGS) $(VERSION_FLAGS) $(INCLUDE)$(RESET)\n"
+	@ printf "$(DEFAULT)::C++ Compile Command - $(YELLOW)$(CXX_COMPILER) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE)$(RESET)\n"
 	@ $(MAKE) -s $(BUILD_DIR)/$(NAME)
 	@ printf "$(DEFAULT)::Program Location - $(GREEN)$(DIR_ROOT)/$(BUILD_ARCH)/$(BUILD_VERSION)/$(NAME)$(RESET)\n"
 
 linux: ;@:
 	$(eval NAME          = $(NAME_BASE))
 	$(eval BUILD_ARCH    = $(DIR_LINUX))
-	$(eval DEBUG_FLAGS   ?= $(FLAGS_DEBUG_COMMON) $(FLAGS_DEBUG_LINUX))
-	$(eval RELEASE_FLAGS ?= $(FLAGS_RELEASE_COMMON) $(FLAGS_RELEASE_LINUX))
+	$(eval DEBUG_FLAGS   = $(FLAGS_DEBUG_COMMON) $(FLAGS_DEBUG_LINUX))
+	$(eval RELEASE_FLAGS = $(FLAGS_RELEASE_COMMON) $(FLAGS_RELEASE_LINUX))
 	$(eval CXX_FLAGS     = $(FLAGS_CXX_COMMON) $(FLAGS_LINUX))
 	$(eval CC_FLAGS      = $(FLAGS_CC_COMMON) $(FLAGS_LINUX))
 	$(eval LD_FLAGS      = $(LDFLAGS_LINUX))
@@ -114,8 +113,8 @@ linux: ;@:
 windows: ;@:
 	$(eval NAME          = $(NAME_BASE).exe)
 	$(eval BUILD_ARCH    = $(DIR_WINDOWS))
-	$(eval DEBUG_FLAGS   ?= $(FLAGS_DEBUG_COMMON) $(FLAGS_DEBUG_WINDOWS))
-	$(eval RELEASE_FLAGS ?= $(FLAGS_RELEASE_COMMON) $(FLAGS_RELEASE_WINDOWS))
+	$(eval DEBUG_FLAGS   = $(FLAGS_DEBUG_COMMON) $(FLAGS_DEBUG_WINDOWS))
+	$(eval RELEASE_FLAGS = $(FLAGS_RELEASE_COMMON) $(FLAGS_RELEASE_WINDOWS))
 	$(eval CXX_FLAGS     = $(FLAGS_CXX_COMMON) $(FLAGS_WINDOWS))
 	$(eval CC_FLAGS      = $(FLAGS_CC_COMMON) $(FLAGS_WINDOWS))
 	$(eval LD_FLAGS      = $(LDFLAGS_WINDOWS))
@@ -123,11 +122,11 @@ windows: ;@:
 	$(eval C_COMPILER    = $(WINDOWS_CC))
 
 release: ;@:
-	$(eval VERSION_FLAGS ?= $(RELEASE_FLAGS))
+	$(eval VERSION_FLAGS = $(RELEASE_FLAGS))
 	$(eval BUILD_VERSION = $(DIR_RELEASE))
 
 debug: ;@:
-	$(eval VERSION_FLAGS ?= $(DEBUG_FLAGS))
+	$(eval VERSION_FLAGS = $(DEBUG_FLAGS))
 	$(eval BUILD_VERSION = $(DIR_DEBUG))
 
 build_dir:
@@ -160,7 +159,7 @@ $(BUILD_OBJS)/%.o: $(SRC)/%.c | build_dir
 	@ -mkdir -p $(dir $@)
 	$(C_COMPILER) $(CC_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@
 
-$(BUILD_DIR)/$(NAME):
+$(BUILD_DIR)/$(NAME): $(CC_OBJS) $(CXX_OBJS)
 	@ printf "::Linking $(CYAN)$@$(RESET)\n"
-	$(CXX_COMPILER) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) $(CC_OBJS) $(CXX_OBJS) -o $@ $(LD_FLAGS)
+	$(CXX_COMPILER) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) $^ -o $@ $(LD_FLAGS)
 
