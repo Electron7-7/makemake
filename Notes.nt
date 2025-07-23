@@ -23,3 +23,7 @@ I want to have options for:
             - architecture-specific flags
 
 I also want default options for all of these; the default option will be my personal preference.
+
+I've got a prototype down that correctly generates the Makefile for this project! It's very bare bones, so it's already very close to being a good default Makefile. The only real issues with the "default" Makefile are that the source directories are hardcoded to this project, but I could fix that by asking the user for the source code directory and then doing some recursive searching to find all the relevant directories.
+
+I got the recursive directory search done! It's a prototype but it works pretty well so far, and even returns prettified text!
