@@ -104,8 +104,8 @@ namespace MakeVariables
         static make_variable_t EXPORT_CXX_FLAGS       = { "CXX_FLAGS"       , "$(FLAGS_CXX_COMMON) $(FLAGS_LINUX)"             , "     ?= "        , true };
         static make_variable_t EXPORT_CC_FLAGS        = { "CC_FLAGS"        , "$(FLAGS_CC_COMMON) $(FLAGS_LINUX)"              , "      ?= "       , true };
         static make_variable_t EXPORT_LD_FLAGS        = { "LD_FLAGS"        , "$(LDFLAGS_LINUX)"                               , "      ?= "       , true };
-        static make_variable_t EXPORT_CXX             = { "CXX"             , "$(LINUX_CXX)"                                   , "           ?= "  , true };
-        static make_variable_t EXPORT_CC              = { "CC"              , "$(LINUX_CC)"                                    , "            ?= " , true };
+        static make_variable_t EXPORT_CXX             = { "CXX_COMPILER"    , "$(LINUX_CXX)"                                   , "  ?= "           , true };
+        static make_variable_t EXPORT_CC              = { "C_COMPILER"      , "$(LINUX_CC)"                                    , "    ?= "         , true };
     }
 
     namespace IfOnWindows
@@ -117,8 +117,8 @@ namespace MakeVariables
         static make_variable_t EXPORT_CXX_FLAGS     = { "CXX_FLAGS"       , "$(FLAGS_CXX_COMMON) $(FLAGS_WINDOWS)"             , "     ?= "        , true };
         static make_variable_t EXPORT_CC_FLAGS      = { "CC_FLAGS"        , "$(FLAGS_CC_COMMON) $(FLAGS_WINDOWS)"              , "      ?= "       , true };
         static make_variable_t EXPORT_LD_FLAGS      = { "LD_FLAGS"        , "$(LDFLAGS_WINDOWS)"                               , "      ?= "       , true };
-        static make_variable_t EXPORT_CXX           = { "CXX"             , "$(WINDOWS_CXX)"                                   , "           ?= "  , true };
-        static make_variable_t EXPORT_CC            = { "CC"              , "$(WINDOWS_CC)"                                    , "            ?= " , true };
+        static make_variable_t EXPORT_CXX           = { "CXX_COMPILER"    , "$(WINDOWS_CXX)"                                   , "  ?= "           , true };
+        static make_variable_t EXPORT_CC            = { "C_COMPILER"      , "$(WINDOWS_CC)"                                    , "    ?= "         , true };
     }
 
     static make_variable_t EXPORT_BUILD_VERSION = { "BUILD_VERSION", "$(DIR_RELEASE)"   , " ?= ", true };
@@ -157,8 +157,8 @@ namespace MakeTargets
         {
             R"~(@ printf "$(DEFAULT)::Architecture - $(BLUE)$(BUILD_ARCH)$(RESET)\n")~",
             R"~(@ printf "$(DEFAULT)::Version - $(BLUE)$(BUILD_VERSION)$(RESET)\n")~",
-            R"~(@ printf "$(DEFAULT)::C Compiler - $(YELLOW)$(CC)$(RESET)\n")~",
-            R"~(@ printf "$(DEFAULT)::C++ Compiler - $(YELLOW)$(CXX)$(RESET)\n")~",
+            R"~(@ printf "$(DEFAULT)::C Compiler - $(YELLOW)$(C_COMPILER)$(RESET)\n")~",
+            R"~(@ printf "$(DEFAULT)::C++ Compiler - $(YELLOW)$(CXX_COMPILER)$(RESET)\n")~",
             R"~(@ $(MAKE) -s $(CC_OBJS) $(CXX_OBJS))~",
             R"~(@ $(MAKE) -s $(BUILD_DIR)/$(NAME))~",
             R"~(@ printf "$(DEFAULT)::Program Location - $(GREEN)$(DIR_ROOT)/$(BUILD_ARCH)/$(BUILD_VERSION)/$(NAME)$(RESET)\n")~",
@@ -176,8 +176,8 @@ namespace MakeTargets
             "$(eval CXX_FLAGS     = $(FLAGS_CXX_COMMON) $(FLAGS_LINUX))",
             "$(eval CC_FLAGS      = $(FLAGS_CC_COMMON) $(FLAGS_LINUX))",
             "$(eval LD_FLAGS      = $(LDFLAGS_LINUX))",
-            "$(eval CXX           = $(LINUX_CXX))",
-            "$(eval CC            = $(LINUX_CC))",
+            "$(eval CXX_COMPILER  = $(LINUX_CXX))",
+            "$(eval C_COMPILER    = $(LINUX_CC))",
         }
     };
 
@@ -192,8 +192,8 @@ namespace MakeTargets
             "$(eval CXX_FLAGS     = $(FLAGS_CXX_COMMON) $(FLAGS_WINDOWS))",
             "$(eval CC_FLAGS      = $(FLAGS_CC_COMMON) $(FLAGS_WINDOWS))",
             "$(eval LD_FLAGS      = $(LDFLAGS_WINDOWS))",
-            "$(eval CXX           = $(WINDOWS_CXX))",
-            "$(eval CC            = $(WINDOWS_CC))",
+            "$(eval CXX_COMPILER  = $(WINDOWS_CXX))",
+            "$(eval C_COMPILER    = $(WINDOWS_CC))",
         }
     };
 
@@ -254,7 +254,7 @@ namespace MakeTargets
         {
             R"~(@ printf "::Compiling $(BLUE)$@$(RESET)\n")~",
             R"~(@ -mkdir -p $(dir $@))~",
-            R"~($(CXX) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@)~",
+            R"~($(CXX_COMPILER) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@)~",
         }
     };
 
@@ -264,7 +264,7 @@ namespace MakeTargets
         {
             R"~(@ printf "::Compiling $(BLUE)$@$(RESET)\n")~",
             R"~(@ -mkdir -p $(dir $@))~",
-            R"~($(CC) $(CC_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@)~",
+            R"~($(C_COMPILER) $(CC_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@)~",
         }
     };
 
@@ -273,7 +273,7 @@ namespace MakeTargets
         R"~($(BUILD_DIR)/$(NAME):)~",
         {
             R"~(@ printf "::Linking $(CYAN)$@$(RESET)\n")~",
-            R"~($(CXX) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) $(CC_OBJS) $(CXX_OBJS) -o $@ $(LD_FLAGS))~",
+            R"~($(CXX_COMPILER) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) $(CC_OBJS) $(CXX_OBJS) -o $@ $(LD_FLAGS))~",
         }
     };
 }
