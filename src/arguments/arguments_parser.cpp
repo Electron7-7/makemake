@@ -10,6 +10,8 @@ std::vector<Option> ArgumentsParser::_valid_options = {};
 std::vector<Flag> ArgumentsParser::_valid_flags = {};
 std::vector<Option> ArgumentsParser::_mandatory_options = {};
 
+std::string source_directory = "";
+
 
 bool _contains(std::vector<Option>& options, const Option& option)
 {
@@ -76,6 +78,8 @@ ErrorCode ArgumentsParser::ParseArguments(int argc, char** argv)
                 continue;
             }
         }
+
+        source_directory = argv[i];
     }
 
     for(const Option& option : _mandatory_options)

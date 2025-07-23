@@ -25,5 +25,6 @@ private:
 };
 
 extern ArgumentsParser* global_ArgumentsParser;
+extern std::string source_directory;
 
 #endif // ARGUMENTS_PARSER_H
