@@ -1,6 +1,21 @@
 # MakeMake
 A C++ Makefile generator for simple, scalable builds.
 
+```
+	Usage: makemake [-hvn] [--no-color] [-s|--source <source_code_dir>] [-p|--name <global_ProgramName>]
+        -h, --help              print help document
+        -v, --version           print program version
+        -n, --dry-run           print the generated Makefile instead of creating/replacing it
+        -s, --source SOURCEDIR  set the source code directory (defaults to 'src')
+        -p, --name NAME         set the name of the final binary (defaults to the name of the current directory)
+
+    Examples:
+    	makemake
+    	makemake -s my_source_code_is_in_this_directory
+    	makemake -p the-name-of-my-executable
+    	makemake -n >> Makefile.test
+```
+
 The default Makefile that MakeMake generates is designed to be a good starting point for projects. It includes:
 	- build targets for both Windows and Linux
 	- build targets for Debug and Release versions
