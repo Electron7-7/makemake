@@ -2,6 +2,7 @@
 #include "arguments/arguments_parser.hpp"
 #include "argument_handlers.hpp"
 #include "prototype_makefile_generator.hpp"
+#include <fstream>
 
 int main(int argc, char** argv)
 {
@@ -23,6 +24,10 @@ int main(int argc, char** argv)
     if(unsigned short return_value = OptionsHandler(global_ArgumentsParser->GetOptions()) != Err::NO_ERROR)
         return return_value;
 
-    printf("%s", prototype_GenerateDefaultMakefile(source_directory).c_str());
+    std::string makefile_data = prototype_GenerateDefaultMakefile(source_directory);
+    std::ofstream makefile("Makefile");
+    makefile << makefile_data;
+    makefile.close();
+
     return 0;
 }
