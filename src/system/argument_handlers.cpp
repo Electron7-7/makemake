@@ -1,6 +1,29 @@
 #include "argument_handlers.hpp"
 #include "arguments/arguments.hpp"
 #include "common/labels.hpp"
+#include <cstdio>
+
+ErrCode helper_CheckOptionHasValue(const Option& option, bool silence_printout = true, const std::string& treat_as_warning_and_show_this_as_the_default_value = "")
+{
+    if(option.HasValue())
+        return Err::NO_ERROR;
+
+    if(!silence_printout)
+    {
+        const char* print_label = ERROR;
+        std::string warning_message = "\n";
+
+        if(!treat_as_warning_and_show_this_as_the_default_value.empty())
+        {
+            print_label = WARN;
+            warning_message = " Defaulting to " + treat_as_warning_and_show_this_as_the_default_value + "\n";
+        }
+
+        printf("%s OptionsHandler - Option [%s, %s] wasn't given a value%s%s", print_label, option.ShortName(), option.LongName(), warning_message.c_str(), COLOR_RESET);
+    }
+
+    return Err::Args::ARGUMENT_OPTION_MISSING;
+}
 
 ErrCode OptionsHandler(std::vector<Option>* options)
 {
@@ -8,23 +31,17 @@ ErrCode OptionsHandler(std::vector<Option>* options)
     {
         if(option == Options::SourceDirectory)
         {
-            if(!option.HasValue())
-            {
-                printf("%s OptionsHandler - Option [%s, %s] is missing its mandatory required value\n%s", ERROR, option.ShortName(), option.LongName(), COLOR_RESET);
-            }
+            if(helper_CheckOptionHasValue(option, false, source_directory) == Err::NO_ERROR)
+                source_directory = option.GetValue();
 
-            source_directory = option.GetValue();
             continue;
         }
 
         if(option == Options::ProgramName)
         {
-            if(!option.HasValue())
-            {
-                printf("%s OptionsHandler - Option [%s, %s] is missing its mandatory required value\n%s", ERROR, option.ShortName(), option.LongName(), COLOR_RESET);
-            }
+            if(helper_CheckOptionHasValue(option, false, "the name of the current working directory"))
+                program_name = option.GetValue();
 
-            program_name = option.GetValue();
             continue;
         }
     }
@@ -45,6 +62,12 @@ ErrCode FlagsHandler(std::vector<Flag>* flags)
         if(flag == Flags::Version)
         {
             printf("    %s\n", _Version_Printout);
+            continue;
+        }
+
+        if(flag == Flags::DryRun)
+        {
+            dry_run = true;
             continue;
         }
     }
