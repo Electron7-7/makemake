@@ -3,6 +3,7 @@
 #include "argument_handlers.hpp"
 #include "common/labels.hpp"
 #include "prototype_makefile_generator.hpp"
+#include <filesystem>
 #include <fstream>
 
 int main(int argc, char** argv)
@@ -10,6 +11,7 @@ int main(int argc, char** argv)
     // Add valid flags
     global_ArgumentsParser->AddFlag(Flags::Help);
     global_ArgumentsParser->AddFlag(Flags::Version);
+    global_ArgumentsParser->AddFlag(Flags::DryRun);
 
     // Add valid options
     global_ArgumentsParser->AddOption(Options::SourceDirectory);
@@ -41,9 +43,23 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    if(dry_run)
+    {
+        printf("%sGenerated Makefile:%s\n%s\n", COLOR_BOLD(GREEN), COLOR_RESET, try_GetMakefile.Data().c_str());
+        return 0;
+    }
+
     std::ofstream makefile("Makefile"); // FIXME: Check if file is able to be written to!
-    makefile << try_GetMakefile.Data();
-    makefile.close();
+    if(makefile)
+    {
+        makefile << try_GetMakefile.Data();
+        makefile.close();
+    }
+    else
+    {
+        printf("%sUnable to write to %s!\n", ERROR, (std::filesystem::current_path().string() + "/Makefile").c_str());
+        return 1;
+    }
 
     return 0;
 }
