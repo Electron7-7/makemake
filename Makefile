@@ -67,8 +67,9 @@ VPATH := $(SRC_DIRS)
 SRC := src
 
 SRC_DIRS :=          \
-    $(SRC)           \
     $(SRC)/arguments \
+    $(SRC)/generator \
+    $(SRC)/makefile  \
     $(SRC)/system    \
 
 

@@ -1,58 +1,7 @@
 #ifndef MAKEFILE_TEMPLATE_H
 #define MAKEFILE_TEMPLATE_H
 
-#include <vector>
-#include <string>
-
-struct make_variable_t
-{
-public:
-    make_variable_t()
-    {}
-
-    make_variable_t(const std::string& Name, const std::string& Value, const std::string& Sign, bool IsExported = false)
-    : name(Name), value(Value), sign(Sign), is_export(IsExported)
-    {}
-
-    std::string name = "";
-    std::string value = "";
-    std::string sign = "";
-    bool is_export = false;
-
-    std::string GetLine() const
-    {
-        std::string return_value = name + sign + value + "\n";
-        if(is_export)
-            return_value = "export " + return_value;
-        return return_value;
-    }
-};
-
-struct make_target_t
-{
-public:
-    make_target_t()
-    {}
-
-    make_target_t(const std::string& Name, const std::vector<std::string>& Value)
-    : name(Name), value(Value)
-    {}
-
-    std::string name = "";
-    std::vector<std::string> value = {};
-
-    std::string GetLines(bool auto_indent = true) const
-    {
-        std::string return_value = name + "\n";
-        for(std::string line : value)
-        {
-            if(auto_indent)
-                return_value += "\t";
-            return_value += line + "\n";
-        }
-        return return_value + "\n";
-    }
-};
+#include "makefile/data_types.hpp"
 
 namespace MakeVariables
 {

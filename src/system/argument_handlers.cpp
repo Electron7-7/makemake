@@ -31,8 +31,8 @@ ErrCode OptionsHandler(std::vector<Option>* options)
     {
         if(option == Options::SourceDirectory)
         {
-            if(helper_CheckOptionHasValue(option, false, source_directory) == Err::NO_ERROR)
-                source_directory = option.GetValue();
+            if(helper_CheckOptionHasValue(option, false, global_SourceCodeDirectory) == Err::NO_ERROR)
+                global_SourceCodeDirectory = option.GetValue();
 
             continue;
         }
@@ -40,7 +40,7 @@ ErrCode OptionsHandler(std::vector<Option>* options)
         if(option == Options::ProgramName)
         {
             if(helper_CheckOptionHasValue(option, false, "the name of the current working directory"))
-                program_name = option.GetValue();
+                global_ProgramName = option.GetValue();
 
             continue;
         }
@@ -67,13 +67,13 @@ ErrCode FlagsHandler(std::vector<Flag>* flags)
 
         if(flag == Flags::DryRun)
         {
-            dry_run = true;
+            global_DryRun = true;
             continue;
         }
 
         if(flag == Flags::debug_NoPrintout)
         {
-            _debug_no_printout = true;
+            _global_DebugNoPrintOut = true;
             continue;
         }
     }
