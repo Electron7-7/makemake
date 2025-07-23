@@ -26,6 +26,7 @@ ErrCode prototype_GetSourceDirectories(const std::string& source_directory)
         return Err::Generator::SOURCE_DIR_INVALID;
 
     for(const auto& entry : std::filesystem::recursive_directory_iterator(source_directory))
+    {
         if(entry.is_regular_file() && (entry.path().extension() == ".cpp" || entry.path().extension() == ".c"))
         {
             std::string valid_directory = entry.path().relative_path().remove_filename();
@@ -41,13 +42,19 @@ ErrCode prototype_GetSourceDirectories(const std::string& source_directory)
             if(final_directory.size() > longest_string.size())
                 longest_string = final_directory;
         }
+    }
 
-    pretty_source_dirs_equal_sign = std::string(" :=").append(((longest_string.size() + number_of_indent_spaces) - src_dirs_variable.size()), ' ') + " \\\n";
+    int longest_directory_length = longest_string.size() + number_of_indent_spaces;
+
+    if(longest_directory_length < src_dirs_variable.length())
+        longest_directory_length = src_dirs_variable.length();
+
+    pretty_source_dirs_equal_sign = std::string(" :=").append((longest_directory_length - src_dirs_variable.size()), ' ') + " \\\n";
 
     for(const std::string& directory : valid_directories)
     {
         std::string spaces = " ";
-        size_t number_of_spaces = longest_string.size() - directory.size();
+        size_t number_of_spaces = (longest_directory_length - number_of_indent_spaces) - directory.size();
         spaces.append(number_of_spaces, ' ');
         source_directories += "    " + directory + spaces + "\\\n";
     }
