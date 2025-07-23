@@ -1,4 +1,5 @@
 #include "prototype_makefile_generator.hpp"
+#include "arguments/arguments.hpp"
 #include "makefile_template.hpp"
 #include <filesystem>
 #include <set>
@@ -7,11 +8,22 @@ std::string source_directories = "";
 std::string pretty_source_dirs_equal_sign = "";
 int number_of_indent_spaces = 4;
 
-void prototype_GetSourceDirectories(const std::string& source_directory)
+std::string prototype_GetProgramName()
+{
+    if(!program_name.empty())
+        return program_name;
+
+    return std::filesystem::current_path().stem();
+}
+
+ErrCode prototype_GetSourceDirectories(const std::string& source_directory)
 {
     std::set<std::string> valid_directories = {};
     std::string longest_string = "";
     std::string src_dirs_variable("SRC_DIRS :=");
+
+    if(!std::filesystem::is_directory(source_directory))
+        return Err::Generator::SOURCE_DIR_INVALID;
 
     for(const auto& entry : std::filesystem::recursive_directory_iterator(source_directory))
         if(entry.is_regular_file() && (entry.path().extension() == ".cpp" || entry.path().extension() == ".c"))
@@ -39,9 +51,11 @@ void prototype_GetSourceDirectories(const std::string& source_directory)
         spaces.append(number_of_spaces, ' ');
         source_directories += "    " + directory + spaces + "\\\n";
     }
+
+    return Err::NO_ERROR;
 }
 
-std::string prototype_GenerateDefaultMakefile(const std::string& source_directory)
+SafeReturn<std::string> prototype_GenerateDefaultMakefile(const std::string& source_directory)
 {
     std::string makefile = "";
 
@@ -91,7 +105,7 @@ std::string prototype_GenerateDefaultMakefile(const std::string& source_director
 
     makefile += "\n";
 
-    makefile += MakeVariables::NAME_BASE.GetLine();
+    makefile += make_variable_t("NAME_BASE", prototype_GetProgramName().c_str(), " := ").GetLine();
 
     makefile += "\n";
 
@@ -142,8 +156,11 @@ std::string prototype_GenerateDefaultMakefile(const std::string& source_director
 
     makefile += "\n";
 
-    prototype_GetSourceDirectories(source_directory);
-    makefile += make_variable_t{"SRC_DIRS", source_directories.c_str(), pretty_source_dirs_equal_sign.c_str()}.GetLine();
+    ErrCode source_directory_return_value = prototype_GetSourceDirectories(source_directory);
+    if(source_directory_return_value != Err::NO_ERROR)
+        return SafeReturn<std::string>("", source_directory_return_value);
+
+    makefile += make_variable_t("SRC_DIRS", source_directories.c_str(), pretty_source_dirs_equal_sign.c_str()).GetLine();
 
     makefile += "\n";
 
@@ -186,5 +203,5 @@ std::string prototype_GenerateDefaultMakefile(const std::string& source_director
     makefile += MakeTargets::TARGET_CC_OBJS.GetLines();
     makefile += MakeTargets::TARGET_PROGRAM.GetLines();
 
-    return makefile;
+    return SafeReturn(makefile);
 }
