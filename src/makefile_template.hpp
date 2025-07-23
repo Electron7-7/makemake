@@ -131,10 +131,6 @@ namespace MakeVariables
 
     static make_variable_t VPATH = { "VPATH", "$(SRC_DIRS)", " := " };
 
-    static make_variable_t SRC = { "SRC", "src", " := " };
-
-    static make_variable_t SRC_DIRS = { "SRC_DIRS", "\n\t$(SRC)           \\\n\t$(SRC)/system    \\\n\t$(SRC)/arguments", " :=          \\" };
-
     static make_variable_t CC_SRCS  = { "CC_SRCS" , "$(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.c))"   , "  := " };
     static make_variable_t CXX_SRCS = { "CXX_SRCS", "$(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.cpp))" , " := "  };
 
