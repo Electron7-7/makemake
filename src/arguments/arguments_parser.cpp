@@ -1,5 +1,6 @@
 #include "arguments_parser.hpp"
 #include "common/labels.hpp"
+#include <cstdio>
 
 ArgumentsParser static_ArgumentsParser;
 ArgumentsParser* global_ArgumentsParser = &static_ArgumentsParser;
