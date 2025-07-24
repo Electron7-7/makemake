@@ -21,7 +21,7 @@ namespace MakeVariables
     static make_variable_t FLAGS_RELEASE_WINDOWS = { "FLAGS_RELEASE_WINDOWS" , "# Nothing yet"             , " := "           };
     static make_variable_t FLAGS_RELEASE_LINUX   = { "FLAGS_RELEASE_LINUX"   , "# Nothing yet"             , "   := "         };
     static make_variable_t FLAGS_CXX_COMMON      = { "FLAGS_CXX_COMMON"      , "-std=c++20"                , "      := "      };
-    static make_variable_t FLAGS_CC_COMMON       = { "FLAGS_CC_COMMON"       , "# Nothing yet"             , "       := "     };
+    static make_variable_t FLAGS_CC_COMMON       = { "FLAGS_CC_COMMON"       , "-std=c11"                  , "       := "     };
     static make_variable_t FLAGS_WINDOWS         = { "FLAGS_WINDOWS"         , "-mwindows -static"         , "         := "   };
     static make_variable_t FLAGS_LINUX           = { "FLAGS_LINUX"           , "# Nothing yet"             , "           := " };
     static make_variable_t LDFLAGS_LINUX         = { "LDFLAGS_LINUX"         , "# Nothing yet"             , "         := "   };

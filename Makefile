@@ -16,7 +16,7 @@ FLAGS_RELEASE_COMMON  := -O3
 FLAGS_RELEASE_WINDOWS := # Nothing yet
 FLAGS_RELEASE_LINUX   := # Nothing yet
 FLAGS_CXX_COMMON      := -std=c++20
-FLAGS_CC_COMMON       := # Nothing yet
+FLAGS_CC_COMMON       := -std=c11
 FLAGS_WINDOWS         := -mwindows -static
 FLAGS_LINUX           := # Nothing yet
 LDFLAGS_LINUX         := # Nothing yet
