@@ -23,6 +23,13 @@ The default Makefile that MakeMake generates is designed to be a good starting p
 	- colored output
 		- with a target for disabling colored output
 
+# Todo
+    - Implement creating multiple binaries based on multiple unique source directories
+        - This will probably require further modularizing the makefile generation, which is something I wanted to do anyways
+    - Implement updating certain parts of an existing Makefile instead of overwriting it entirely
+        - For example: changing the C++/C standard or fully replacing the `FLAGS_DEBUG_LINUX` variable without overwriting any additional customization done to the file
+        - This will require more complex file interaction; for example, the ability to search for specific strings in the Makefile in order to replace them
+
 # What is MakeMake?
 MakeMake takes a unique approach towards build targets. Instead of having different targets for different builds, there's a single `build` target that will build the program; the rest of the build targets configure the exported variables, setting up the environment for the final `build` target. The tradeoff is ease of use and simplicity for complexity. Instead of having to either manually change variables in the Makefile or on the command line, or even worse: using CMake, you can just call one or more of the other targets before `build`. You can even call them in any order you want; as long as `build` is the last target called.
 
