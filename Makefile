@@ -22,7 +22,7 @@ FLAGS_LINUX           := # Nothing yet
 LDFLAGS_LINUX         := -L src/lib -lgetargs
 LDFLAGS_WINDOWS       := -L src/lib -lgetargs
 
-INCLUDE := -I src
+INCLUDE := -I src src/include
 
 DIR_ROOT    := build
 DIR_LINUX   := Linux
