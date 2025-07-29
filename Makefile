@@ -19,8 +19,8 @@ FLAGS_CXX_COMMON      := -std=c++20
 FLAGS_CC_COMMON       := # Nothing yet
 FLAGS_WINDOWS         := -mwindows -static
 FLAGS_LINUX           := # Nothing yet
-LDFLAGS_LINUX         := # Nothing yet
-LDFLAGS_WINDOWS       := # Nothing yet
+LDFLAGS_LINUX         := -L src/lib -lgetargs
+LDFLAGS_WINDOWS       := -L src/lib -lgetargs
 
 INCLUDE := -I src
 
