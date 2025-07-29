@@ -27,3 +27,6 @@ I also want default options for all of these; the default option will be my pers
 I've got a prototype down that correctly generates the Makefile for this project! It's very bare bones, so it's already very close to being a good default Makefile. The only real issues with the "default" Makefile are that the source directories are hardcoded to this project, but I could fix that by asking the user for the source code directory and then doing some recursive searching to find all the relevant directories.
 
 I got the recursive directory search done! It's a prototype but it works pretty well so far, and even returns prettified text!
+
+[07/28/25]
+I created the `getargs` library today and decided that version 2.0 of `makemake` will start off by removing all argument-handling code and replacing it with `getargs`.
