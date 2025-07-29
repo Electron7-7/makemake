@@ -1,35 +1,47 @@
-#include "arguments/arguments.hpp"
-#include "arguments/arguments_parser.hpp"
-#include "argument_handlers.hpp"
+#include "arguments.hpp"
+#include "getargs/argument_parser.hpp"
 #include "common/labels.hpp"
 #include "generator/makefile_generator.hpp"
 #include <filesystem>
 #include <fstream>
 
+std::string SourceCodeDirectory = "src";
+std::string ProgramName = std::filesystem::current_path().stem().c_str();
+
 int main(int argc, char** argv)
 {
     // Add valid flags
-    global_ArgumentsParser->AddFlag(Flags::Help);
-    global_ArgumentsParser->AddFlag(Flags::Version);
-    global_ArgumentsParser->AddFlag(Flags::DryRun);
-    global_ArgumentsParser->AddFlag(Flags::debug_NoPrintout);
+    global_ArgumentParser->AddFlag(&Flags::Help);
+    global_ArgumentParser->AddFlag(&Flags::Version);
+    global_ArgumentParser->AddFlag(&Flags::DryRun);
+    global_ArgumentParser->AddFlag(&Flags::debug_NoPrintout);
 
     // Add valid options
-    global_ArgumentsParser->AddOption(Options::SourceDirectory);
-    global_ArgumentsParser->AddOption(Options::ProgramName);
+    global_ArgumentParser->AddOption(&Options::SourceDirectory);
+    global_ArgumentParser->AddOption(&Options::ProgramName);
 
     // Parse all arguments
-    global_ArgumentsParser->ParseArguments(argc, argv);
+    global_ArgumentParser->ParseArguments(argc, argv);
 
-    // Handle flags
-    if(unsigned short return_value = FlagsHandler(global_ArgumentsParser->GetFlags()) != Err::NO_ERROR)
-        return return_value;
+    if(Flags::Help.IsActive())
+    {
+        printf("%s\n    %s\n", _Help_Printout, _Version_Printout);
+        return 0;
+    }
 
-    // Handle options
-    if(unsigned short return_value = OptionsHandler(global_ArgumentsParser->GetOptions()) != Err::NO_ERROR)
-        return return_value;
+    if(Flags::Version.IsActive())
+    {
+        printf("    %s\n", _Version_Printout);
+        return 0;
+    }
 
-    SafeReturn<std::string> try_GetMakefile = GenerateDefaultMakefile();
+    if(Options::SourceDirectory.IsActive() && Options::SourceDirectory.HasValue())
+        SourceCodeDirectory = Options::SourceDirectory.GetValue();
+
+    if(Options::ProgramName.IsActive() && Options::ProgramName.HasValue())
+        ProgramName = Options::ProgramName.GetValue();
+
+    SafeReturn<const char*> try_GetMakefile = GenerateDefaultMakefile();
     ErrCode error_code = try_GetMakefile.ErrorCode();
 
     if(error_code != Err::NO_ERROR)
@@ -37,21 +49,21 @@ int main(int argc, char** argv)
         switch(error_code)
         {
         case Err::Generator::SOURCE_DIR_INVALID:
-            printf("%s The source directory is invalid/doesn't exist!\n%s", ERROR, COLOR_RESET);
+            printf("%s The source directory is invalid/doesn't exist!\n%s", ERROR(), COLOR_RESET);
             break;
         }
 
         return 1;
     }
 
-    if(global_DryRun)
+    if(Flags::DryRun.IsActive())
     {
-        if(!_global_DebugNoPrintOut)
-            printf("%s\n", try_GetMakefile.Data().c_str());
+        if(!Flags::debug_NoPrintout.IsActive())
+            printf("%s\n", try_GetMakefile.Data());
         return 0;
     }
 
-    std::ofstream makefile("Makefile"); // FIXME: Check if file is able to be written to!
+    std::ofstream makefile("Makefile");
     if(makefile)
     {
         makefile << try_GetMakefile.Data();
@@ -59,7 +71,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        printf("%sUnable to write to %s!\n", ERROR, (std::filesystem::current_path().string() + "/Makefile").c_str());
+        printf("%sUnable to write to %s!\n", ERROR(), (std::filesystem::current_path().string() + "/Makefile").c_str());
         return 1;
     }
 
