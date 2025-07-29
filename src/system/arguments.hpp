@@ -1,21 +1,24 @@
 #ifndef ARGUMENTS_H
 #define ARGUMENTS_H
 
-#include "argument.hpp"
+#include "getargs/argument.hpp"
+
+#include <string>
 
 namespace Flags
 {
-    const Flag Help     ("--help", "-h");
-    const Flag Version  ("--version", "-v");
-    const Flag DryRun   ("--dry-run", "-n");
+    static Flag Help     ("--help", "-h");
+    static Flag Version  ("--version", "-v");
+    static Flag DryRun   ("--dry-run", "-n");
+    static Flag NoColor  ("--no-color");
 
-    const Flag debug_NoPrintout ("--no-printout", "");
+    static Flag debug_NoPrintout("--no-printout");
 }
 
 namespace Options
 {
-    const Option SourceDirectory ("--source", "-s");
-    const Option ProgramName     ("--name", "-p");
+    static Option SourceDirectory ("--source", "-s");
+    static Option ProgramName     ("--name", "-p");
 }
 
 constexpr const char* _Help_Printout =
@@ -30,9 +33,6 @@ R"~(    Usage: makemake [-hvn] [--no-color] [-s|--source <source_code_dir>] [-p|
 
 constexpr const char* _Version_Printout = "makemake v1.0.0";
 
-inline std::string global_SourceCodeDirectory = "src";
-inline std::string global_ProgramName = "";
-inline bool global_DryRun = false;
-inline bool _global_DebugNoPrintOut = false;
-
+extern std::string SourceCodeDirectory;
+extern std::string ProgramName;
 #endif // ARGUMENTS_H
