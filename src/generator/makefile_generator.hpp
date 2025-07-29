@@ -2,8 +2,7 @@
 #define MAKEFILE_GENERATOR_H
 
 #include "common/error_codes.hpp"
-#include <string>
 
-SafeReturn<std::string> GenerateDefaultMakefile();
+SafeReturn<const char*> GenerateDefaultMakefile();
 
 #endif // MAKEFILE_GENERATOR_H
