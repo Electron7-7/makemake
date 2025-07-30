@@ -4,18 +4,19 @@
 #include <filesystem>
 #include <set>
 
-std::string source_directories = "";
-std::string pretty_source_dirs_equal_sign = "";
-int number_of_indent_spaces = 4;
+#define number_of_indent_spaces 4
 
-ErrCode GetSourceDirectories()
+SafeReturn<make_variable_t> try_GetSourceDirectories()
 {
+    std::string source_directories = "";
+    std::string pretty_source_dirs_equal_sign = "";
+
     std::set<std::string> valid_directories = {};
     std::string longest_string = "";
     std::string src_dirs_variable("SRC_DIRS :=");
 
     if(!std::filesystem::is_directory(SourceCodeDirectory))
-        return Err::Generator::SOURCE_DIR_INVALID;
+        return SafeReturn(make_variable_t("", "", ""), Err::Generator::SOURCE_DIR_INVALID);
 
     for(const auto& entry : std::filesystem::recursive_directory_iterator(SourceCodeDirectory))
     {
@@ -51,10 +52,10 @@ ErrCode GetSourceDirectories()
         source_directories += "    " + directory + spaces + "\\\n";
     }
 
-    return Err::NO_ERROR;
+    return SafeReturn(make_variable_t("SRC_DIRS", source_directories.c_str(), pretty_source_dirs_equal_sign.c_str()));
 }
 
-SafeReturn<const char*> GenerateDefaultMakefile()
+SafeReturn<const char*> try_GenerateDefaultMakefile()
 {
     std::string makefile = "";
 
@@ -155,11 +156,11 @@ SafeReturn<const char*> GenerateDefaultMakefile()
 
     makefile += "\n";
 
-    ErrCode global_SourceCodeDirectory_return_value = GetSourceDirectories();
-    if(global_SourceCodeDirectory_return_value != Err::NO_ERROR)
-        return SafeReturn<const char*>("", global_SourceCodeDirectory_return_value);
+    SafeReturn get_source_directories = try_GetSourceDirectories();
+    if(get_source_directories.ErrorCode() != Err::NO_ERROR)
+        return SafeReturn("", get_source_directories.ErrorCode());
 
-    makefile += make_variable_t("SRC_DIRS", source_directories.c_str(), pretty_source_dirs_equal_sign.c_str()).GetLine();
+    makefile += get_source_directories.Data().GetLine();
 
     makefile += "\n";
 
