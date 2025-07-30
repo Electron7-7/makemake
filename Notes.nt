@@ -30,3 +30,8 @@ I got the recursive directory search done! It's a prototype but it works pretty 
 
 [07/28/25]
 I created the `getargs` library today and decided that version 2.0 of `makemake` will start off by removing all argument-handling code and replacing it with `getargs`.
+
+[07/29/25]
+I'm going to implement source directory updating for `makemake`. In under an hour.
+
+I JUST MANAGED TO FINISH IN UNDER AN HOUR!! WOOOOO!!
