@@ -22,7 +22,7 @@ FLAGS_LINUX           := # Nothing yet
 LDFLAGS_LINUX         := -L src/lib -lgetargs
 LDFLAGS_WINDOWS       := -L src/lib -lgetargs
 
-INCLUDE := -I src src/include
+INCLUDE := -I src -I src/include
 
 DIR_ROOT    := build
 DIR_LINUX   := Linux
@@ -67,7 +67,6 @@ VPATH := $(SRC_DIRS)
 SRC := src
 
 SRC_DIRS :=          \
-    $(SRC)/arguments \
     $(SRC)/generator \
     $(SRC)/makefile  \
     $(SRC)/system    \
