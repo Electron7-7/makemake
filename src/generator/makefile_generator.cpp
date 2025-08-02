@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <set>
 
+std::string makefile = "";
+
 #define number_of_indent_spaces 4
 
 SafeReturn<make_variable_t> try_GetSourceDirectories()
@@ -57,8 +59,6 @@ SafeReturn<make_variable_t> try_GetSourceDirectories()
 
 SafeReturn<const char*> try_GenerateDefaultMakefile()
 {
-    std::string makefile = "";
-
     makefile += MakeVariables::LINUX_CXX.GetLine();
     makefile += MakeVariables::LINUX_CC.GetLine();
 
