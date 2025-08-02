@@ -33,7 +33,7 @@ R"~(    Usage: makemake [-hvn] [--no-color] [-s|--source <source_code_dir>] [-p|
         -p, --name NAME             set the name of the final binary (defaults to the name of the current directory)
 )~";
 
-constexpr const char* _Version_Printout = "makemake v2.1.0";
+constexpr const char* _Version_Printout = "makemake v2.1.1";
 
 extern std::string SourceCodeDirectory;
 extern std::string ProgramName;
