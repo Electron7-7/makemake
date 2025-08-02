@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <set>
 
+std::string makefile = "";
+
 std::string source_directories = "";
 std::string pretty_source_dirs_equal_sign = "";
 int number_of_indent_spaces = 4;
@@ -64,8 +66,6 @@ ErrCode GetSourceDirectories()
 
 SafeReturn<std::string> GenerateDefaultMakefile()
 {
-    std::string makefile = "";
-
     makefile += MakeVariables::LINUX_CXX.GetLine();
     makefile += MakeVariables::LINUX_CC.GetLine();
 
