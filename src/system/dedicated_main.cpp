@@ -1,13 +1,13 @@
 #include "arguments.hpp"
 #include "getargs/argument_parser.hpp"
 #include "common/labels.hpp"
-#include "makefile/data_types.hpp"
 #include "makefile/generating.hpp"
+#include "makefile/editing.hpp"
 
 #include <filesystem>
 #include <fstream>
 
-constexpr const char* ERR_STR_SOURCE_DIR_INVALID = "The provided source directory is invalid/doesn't exist!";
+const char* ERR_STR_SOURCE_DIR_INVALID = "The provided source directory is invalid/doesn't exist!";
 
 std::string SourceCodeDirectory = "src";
 std::string ProgramName = std::filesystem::current_path().stem().c_str();
@@ -49,32 +49,11 @@ int main(int argc, char** argv)
 
     if(Flags::UpdateSourceDirs.IsActive() && makefile_already_exists)
     {
-        SafeReturn replacement_string = try_GetSourceDirectories();
-
-        // FIXME: Repeated code
-        if(replacement_string.ErrorCode() == Err::Generator::SOURCE_DIR_INVALID)
+        if(!try_UpdateSourceDirectories())
         {
             printf("%s%s\n%s", ERROR(), ERR_STR_SOURCE_DIR_INVALID, COLOR_RESET);
             return 1;
         }
-
-        std::fstream makefile;
-        std::stringstream makefile_string_stream;
-        std::string makefile_string;
-
-        makefile.open("Makefile");
-        makefile_string_stream << makefile.rdbuf();
-        makefile_string = makefile_string_stream.str();
-
-        size_t erase_start = makefile_string.find("SRC_DIRS :=");
-        size_t erase_end = makefile_string.rfind("\\\n", makefile_string.find("CC_SRCS")) + 3;
-
-        makefile_string.erase(erase_start, (erase_end - erase_start));
-        makefile_string.insert(erase_start, replacement_string.Data().GetLine());
-
-        makefile.seekp(0);
-        makefile << makefile_string;
-        makefile.close();
         return 0;
     }
 
@@ -82,7 +61,7 @@ int main(int argc, char** argv)
     ErrCode error_code = try_GetMakefile.ErrorCode();
 
     // FIXME: Repeated code
-    if(error_code == Err::Generator::SOURCE_DIR_INVALID)
+    if(error_code == Err::Generating::SOURCE_DIR_INVALID)
     {
         printf("%s%s\n%s", ERROR(), ERR_STR_SOURCE_DIR_INVALID, COLOR_RESET);
         return 1;

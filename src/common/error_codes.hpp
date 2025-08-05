@@ -13,7 +13,7 @@ namespace Err
         constexpr unsigned short MANDATORY_ARGUMENT_OPTION_MISSING = 0x2; // A mandatory 'option' argument flag is missing its option
     }
 
-    namespace Generator
+    namespace Generating
     {
         constexpr unsigned short SOURCE_DIR_INVALID = 0x2;
     }
