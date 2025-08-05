@@ -1,8 +1,8 @@
 #include "arguments.hpp"
 #include "getargs/argument_parser.hpp"
 #include "common/labels.hpp"
-#include "generator/makefile_generation.hpp"
 #include "makefile/data_types.hpp"
+#include "makefile/generating.hpp"
 
 #include <filesystem>
 #include <fstream>
