@@ -3,12 +3,13 @@ A C++ Makefile generator for simple, scalable builds.
 
 ```
     Usage: makemake [-hvn] [--no-color] [-s|--source <source_code_dir>] [-p|--name <global_ProgramName>]
-        -h, --help              print help document
-        -v, --version           print program version
-        -n, --dry-run           print the generated Makefile instead of creating/replacing it
-        -s, --source SOURCEDIR  set the source code directory (defaults to 'src')
-        -p, --name NAME         set the name of the final binary (defaults to the name of the current directory)
-    
+        -h, --help                  print help document
+        -v, --version               print program version
+        -n, --dry-run               print the generated Makefile instead of creating/replacing it
+        -s, --source SOURCEDIR      set the source code directory (defaults to 'src')
+        -u, --update-source-dirs    only update the source directories in an existing Makefile (generates a new Makefile if none exists)
+        -p, --name NAME             set the name of the final binary (defaults to the name of the current directory)
+
     Examples:
         makemake
         makemake -s my_source_code_is_in_this_directory
@@ -17,11 +18,11 @@ A C++ Makefile generator for simple, scalable builds.
 ```
 
 The default Makefile that MakeMake generates is designed to be a good starting point for projects. It includes:
-	- build targets for both Windows and Linux
-	- build targets for Debug and Release versions
-	- lots of easily configurable variables
-	- colored output
-		- with a target for disabling colored output
+    - build targets for both Windows and Linux
+    - build targets for Debug and Release versions
+    - lots of easily configurable variables
+    - colored output
+        - with a target for disabling colored output
 
 # What is MakeMake?
 MakeMake takes a unique approach towards build targets. Instead of having different targets for different builds, there's a single `build` target that will build the program; the rest of the build targets configure the exported variables, setting up the environment for the final `build` target. The tradeoff is ease of use and simplicity for complexity. Instead of having to either manually change variables in the Makefile or on the command line, or even worse: using CMake, you can just call one or more of the other targets before `build`. You can even call them in any order you want; as long as `build` is the last target called.

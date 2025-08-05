@@ -1,40 +1,35 @@
-#include "makefile_generator.hpp"
-#include "arguments/arguments.hpp"
-#include "makefile/default_makefile.hpp"
+#include "generating.hpp"
+#include "system/arguments.hpp"
+#include "default_makefile.hpp"
 #include <filesystem>
 #include <set>
 
-std::string source_directories = "";
-std::string pretty_source_dirs_equal_sign = "";
-int number_of_indent_spaces = 4;
+std::string makefile = "";
 
-std::string prototype_GetProgramName()
+#define number_of_indent_spaces 4
+
+SafeReturn<make_variable_t> try_GetSourceDirectories()
 {
-    if(!global_ProgramName.empty())
-        return global_ProgramName;
+    std::string source_directories = "";
+    std::string pretty_source_dirs_equal_sign = "";
 
-    return std::filesystem::current_path().stem().generic_string();
-}
-
-ErrCode GetSourceDirectories()
-{
     std::set<std::string> valid_directories = {};
     std::string longest_string = "";
     std::string src_dirs_variable("SRC_DIRS :=");
 
-    if(!std::filesystem::is_directory(global_SourceCodeDirectory))
-        return Err::Generator::SOURCE_DIR_INVALID;
+    if(!std::filesystem::is_directory(SourceCodeDirectory))
+        return SafeReturn(make_variable_t("", "", ""), Err::Generating::SOURCE_DIR_INVALID);
 
-    for(const auto& entry : std::filesystem::recursive_directory_iterator(global_SourceCodeDirectory))
+    for(const auto& entry : std::filesystem::recursive_directory_iterator(SourceCodeDirectory))
     {
         if(entry.is_regular_file() && (entry.path().extension() == ".cpp" || entry.path().extension() == ".c"))
         {
             std::string valid_directory = entry.path().relative_path().remove_filename().generic_string();
 
-            std::string truncated_directory = valid_directory.substr(global_SourceCodeDirectory.size() + 1);
+            std::string truncated_directory = valid_directory.substr(SourceCodeDirectory.size() + 1);
             std::string final_directory = "$(SRC)/" + truncated_directory.substr(0, truncated_directory.size() - 1);
 
-            if(!valid_directory.compare(global_SourceCodeDirectory + "/"))
+            if(!valid_directory.compare(SourceCodeDirectory + "/"))
                 final_directory.erase(final_directory.size() - 1);
 
             valid_directories.insert(final_directory);
@@ -59,13 +54,11 @@ ErrCode GetSourceDirectories()
         source_directories += "    " + directory + spaces + "\\\n";
     }
 
-    return Err::NO_ERROR;
+    return SafeReturn(make_variable_t("SRC_DIRS", source_directories.c_str(), pretty_source_dirs_equal_sign.c_str()));
 }
 
-SafeReturn<std::string> GenerateDefaultMakefile()
+SafeReturn<const char*> try_GenerateDefaultMakefile()
 {
-    std::string makefile = "";
-
     makefile += MakeVariables::LINUX_CXX.GetLine();
     makefile += MakeVariables::LINUX_CC.GetLine();
 
@@ -112,7 +105,7 @@ SafeReturn<std::string> GenerateDefaultMakefile()
 
     makefile += "\n";
 
-    makefile += make_variable_t("NAME_BASE", prototype_GetProgramName().c_str(), " := ").GetLine();
+    makefile += make_variable_t("NAME_BASE", ProgramName, " := ").GetLine();
 
     makefile += "\n";
 
@@ -159,15 +152,15 @@ SafeReturn<std::string> GenerateDefaultMakefile()
 
     makefile += "\n";
 
-    makefile += make_variable_t("SRC", global_SourceCodeDirectory.c_str(), " := ").GetLine();
+    makefile += make_variable_t("SRC", SourceCodeDirectory.c_str(), " := ").GetLine();
 
     makefile += "\n";
 
-    ErrCode global_SourceCodeDirectory_return_value = GetSourceDirectories();
-    if(global_SourceCodeDirectory_return_value != Err::NO_ERROR)
-        return SafeReturn<std::string>("", global_SourceCodeDirectory_return_value);
+    SafeReturn get_source_directories = try_GetSourceDirectories();
+    if(get_source_directories.ErrorCode() != Err::NO_ERROR)
+        return SafeReturn("", get_source_directories.ErrorCode());
 
-    makefile += make_variable_t("SRC_DIRS", source_directories.c_str(), pretty_source_dirs_equal_sign.c_str()).GetLine();
+    makefile += get_source_directories.Data().GetLine();
 
     makefile += "\n";
 
@@ -210,5 +203,5 @@ SafeReturn<std::string> GenerateDefaultMakefile()
     makefile += MakeTargets::TARGET_CC_OBJS.GetLines();
     makefile += MakeTargets::TARGET_PROGRAM.GetLines();
 
-    return SafeReturn(makefile);
+    return SafeReturn(makefile.c_str());
 }
