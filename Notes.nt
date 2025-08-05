@@ -35,3 +35,8 @@ I created the `getargs` library today and decided that version 2.0 of `makemake`
 I'm going to implement source directory updating for `makemake`. In under an hour.
 
 I JUST MANAGED TO FINISH IN UNDER AN HOUR!! WOOOOO!!
+
+[08/04/25]
+I want to implement more ways of "updating" the Makefile. Specifically, I want to add a flag for changing the C/C++ standards.
+
+Well, I didn't do that but I did update the "update source directories" functionality to not only be its own function but to also be much much MUCH better at what it does.
