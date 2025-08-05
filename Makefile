@@ -15,7 +15,7 @@ FLAGS_DEBUG_WINDOWS   := # Nothing yet
 FLAGS_RELEASE_COMMON  := -O3
 FLAGS_RELEASE_WINDOWS := # Nothing yet
 FLAGS_RELEASE_LINUX   := # Nothing yet
-FLAGS_CXX_COMMON      := -std=c++20
+FLAGS_CXX_COMMON      := -std=c++23
 FLAGS_CC_COMMON       := # Nothing yet
 FLAGS_WINDOWS         := -mwindows -static
 FLAGS_LINUX           := # Nothing yet
@@ -66,10 +66,9 @@ VPATH := $(SRC_DIRS)
 
 SRC := src
 
-SRC_DIRS :=          \
-    $(SRC)/generator \
-    $(SRC)/makefile  \
-    $(SRC)/system    \
+SRC_DIRS :=         \
+    $(SRC)/makefile \
+    $(SRC)/system   \
 
 
 CC_SRCS  := $(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.c))
@@ -162,4 +161,3 @@ $(BUILD_OBJS)/%.o: $(SRC)/%.c | build_dir
 $(BUILD_DIR)/$(NAME): $(CC_OBJS) $(CXX_OBJS)
 	@ printf "::Linking $(CYAN)$@$(RESET)\n"
 	$(CXX_COMPILER) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) $^ -o $@ $(LD_FLAGS)
-
