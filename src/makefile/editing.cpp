@@ -54,12 +54,17 @@ bool try_UpdateSourceDirectories()
     size_t erase_end = iterator - 1;
 
     std::string trimmed_replacement_string = replacement_string.Data().GetLine();
-    trimmed_replacement_string.pop_back();
-    if(makefile_string.at(erase_end + 1) == '\n')
-        trimmed_replacement_string.pop_back();
 
-    std::print("Erasing:\n[\x1b[1;41;37m{}\x1b[0m]\n", makefile_string.substr(erase_start, (erase_end - erase_start)));;
-    std::print("Replacement:\n[\x1b[1;42;37m{}\x1b[0m]\n", trimmed_replacement_string);
+    /*
+        * Quick Description for why I use `pop_back()` 1 or 2 times:
+        * The replacement string ends with two empty lines. The first one always gets
+        * removed, but the second one only gets removed if the character right after
+        * the "to be replaced" selection is also a new line. The way I've formatted
+        * these directory entries adds a backslash to the end of the last entry, and
+        * `make` will throw an error if there isn't an empty line immediately after.
+    */
+    trimmed_replacement_string.pop_back();
+    if(makefile_string.at(erase_end + 1) == '\n') trimmed_replacement_string.pop_back();
 
     makefile_string.erase(erase_start, (erase_end - erase_start));
     makefile_string.insert(erase_start, trimmed_replacement_string);
