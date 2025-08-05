@@ -1,5 +1,5 @@
-#ifndef MAKEFILE_GENERATOR_H
-#define MAKEFILE_GENERATOR_H
+#ifndef MAKEFILE_GENERATION_H
+#define MAKEFILE_GENERATION_H
 
 #include "common/error_codes.hpp"
 
@@ -10,4 +10,4 @@ SafeReturn<make_variable_t> try_GetSourceDirectories();
 
 const char* GetSourceDirectories();
 
-#endif // MAKEFILE_GENERATOR_H
+#endif // makefile_generation_H
