@@ -3,7 +3,6 @@
 #include "generating.hpp"
 #include "data_types.hpp"
 
-#include <print>
 #include <fstream>
 #include <sstream>
 #include <filesystem>

@@ -1,6 +1,8 @@
 #include "generating.hpp"
 #include "system/arguments.hpp"
 #include "default_makefile.hpp"
+#include "common/printing.hpp"
+
 #include <filesystem>
 #include <set>
 
@@ -17,19 +19,22 @@ SafeReturn<make_variable_t> try_GetSourceDirectories()
     std::string longest_string = "";
     std::string src_dirs_variable("SRC_DIRS :=");
 
-    if(!std::filesystem::is_directory(SourceCodeDirectory))
+    if(!std::filesystem::is_directory(Options::SourceDirectory.GetValue()))
+    {
+        PRINT_ERROR("try_GetSourceDirectories - Source directory '{}' is invalid!", Options::SourceDirectory.GetValue())
         return SafeReturn(make_variable_t("", "", ""), Err::Generating::SOURCE_DIR_INVALID);
+    }
 
-    for(const auto& entry : std::filesystem::recursive_directory_iterator(SourceCodeDirectory))
+    for(const auto& entry : std::filesystem::recursive_directory_iterator(Options::SourceDirectory.GetValue()))
     {
         if(entry.is_regular_file() && (entry.path().extension() == ".cpp" || entry.path().extension() == ".c"))
         {
             std::string valid_directory = entry.path().relative_path().remove_filename().generic_string();
 
-            std::string truncated_directory = valid_directory.substr(SourceCodeDirectory.size() + 1);
+            std::string truncated_directory = valid_directory.substr(std::string(Options::SourceDirectory.GetValue()).size() + 1);
             std::string final_directory = "$(SRC)/" + truncated_directory.substr(0, truncated_directory.size() - 1);
 
-            if(!valid_directory.compare(SourceCodeDirectory + "/"))
+            if(!valid_directory.compare(std::string(Options::SourceDirectory.GetValue()) + "/"))
                 final_directory.erase(final_directory.size() - 1);
 
             valid_directories.insert(final_directory);
@@ -105,7 +110,7 @@ SafeReturn<const char*> try_GenerateDefaultMakefile()
 
     makefile += "\n";
 
-    makefile += make_variable_t("NAME_BASE", ProgramName, " := ").GetLine();
+    makefile += make_variable_t("NAME_BASE", Options::ProgramName.GetValue(), " := ").GetLine();
 
     makefile += "\n";
 
@@ -148,11 +153,16 @@ SafeReturn<const char*> try_GenerateDefaultMakefile()
 
     makefile += "\n";
 
+    makefile += MakeVariables::EXPORT_CLEAN_ARCH.GetLine();
+    makefile += MakeVariables::EXPORT_CLEAN_VERSION.GetLine();
+
+    makefile += "\n";
+
     makefile += MakeVariables::VPATH.GetLine();
 
     makefile += "\n";
 
-    makefile += make_variable_t("SRC", SourceCodeDirectory.c_str(), " := ").GetLine();
+    makefile += make_variable_t("SRC", Options::SourceDirectory.GetValue(), " := ").GetLine();
 
     makefile += "\n";
 
@@ -161,8 +171,6 @@ SafeReturn<const char*> try_GenerateDefaultMakefile()
         return SafeReturn("", get_source_directories.ErrorCode());
 
     makefile += get_source_directories.Data().GetLine();
-
-    makefile += "\n";
 
     makefile += MakeVariables::CC_SRCS.GetLine();
     makefile += MakeVariables::CXX_SRCS.GetLine();
@@ -197,11 +205,47 @@ SafeReturn<const char*> try_GenerateDefaultMakefile()
     makefile += MakeTargets::TARGET_RELEASE.GetLines();
     makefile += MakeTargets::TARGET_DEBUG.GetLines();
     makefile += MakeTargets::TARGET_BUILD_DIR.GetLines();
+
+    makefile += MakeTargets::CLEAN_FUNCTIONS_COMMENT.GetLine();
+    makefile += MakeTargets::CLEAN_FUNCTION.GetLine();
+    makefile += MakeTargets::CLEAN_OBJS_FUNCTION.GetLine();
+    makefile += MakeTargets::CLEAN_DIRTY_FUNCTION.GetLine();
+    makefile += MakeTargets::CLEAN_PRINT_FUNCTION.GetLine();
+
+    makefile += "\n";
+
+    makefile += MakeTargets::CLEAN_TARGET_COMMENT.GetLine();
+    makefile += MakeTargets::TARGET_CLEAN_TARGET.GetLines();
+
+    makefile += MakeTargets::CLEAN_ALL_COMMENT.GetLine();
+    makefile += MakeTargets::TARGET_CLEAN_ALL.GetLines();
+
+    makefile += MakeTargets::CLEAN_COMMENT.GetLine();
     makefile += MakeTargets::TARGET_CLEAN.GetLines();
+
+    makefile += MakeTargets::MOSTLY_CLEAN_COMMENT.GetLine();
+    makefile += MakeTargets::TARGET_MOSTLY_CLEAN.GetLines();
+
     makefile += MakeTargets::TARGET_DISABLE_COLORS.GetLines();
+
+    makefile += MakeTargets::CXX_OBJS_COMMENT.GetLine();
     makefile += MakeTargets::TARGET_CXX_OBJS.GetLines();
+
+    makefile += MakeTargets::C_OBJS_COMMENT.GetLine();
     makefile += MakeTargets::TARGET_CC_OBJS.GetLines();
+
+    makefile += MakeTargets::PROGRAM_COMMENT.GetLine();
     makefile += MakeTargets::TARGET_PROGRAM.GetLines();
+
+    makefile += "\n";
+
+    makefile += MakeTargets::NOTHING_TO_CLEAN_COMMENT.GetLine();
+    makefile += MakeTargets::TARGET_NOTHING_TO_CLEAN.GetLines();
+
+    makefile += MakeTargets::CLEAN_PRINTOUT_COMMENT.GetLine();
+    makefile += MakeTargets::TARGET_CLEAN_PRINTOUT.GetLines();
+
+    makefile.pop_back(); // Remove the extraneous newline
 
     return SafeReturn(makefile.c_str());
 }
