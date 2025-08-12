@@ -4,6 +4,7 @@
 #include "makefile/generating.hpp"
 #include "makefile/editing.hpp"
 
+#include <print>
 #include <filesystem>
 #include <fstream>
 
@@ -31,13 +32,13 @@ int main(int argc, char** argv)
 
     if(Flags::Help.IsActive())
     {
-        printf("%s\n    %s\n", _Help_Printout, _Version_Printout);
+        std::print("{}\n    {}\n", _Help_Printout, _Version_Printout);
         return 0;
     }
 
     if(Flags::Version.IsActive())
     {
-        printf("    %s\n", _Version_Printout);
+        std::print("    {}\n", _Version_Printout);
         return 0;
     }
 
@@ -51,7 +52,8 @@ int main(int argc, char** argv)
     {
         if(!try_UpdateSourceDirectories())
         {
-            printf("%s%s\n%s", ERROR(), ERR_STR_SOURCE_DIR_INVALID, COLOR_RESET);
+            // FIXME: Repeated code
+            std::print("{}{}\n{}", ERROR(), ERR_STR_SOURCE_DIR_INVALID, COLOR_RESET);
             return 1;
         }
         return 0;
@@ -60,17 +62,17 @@ int main(int argc, char** argv)
     SafeReturn try_GetMakefile = try_GenerateDefaultMakefile();
     ErrCode error_code = try_GetMakefile.ErrorCode();
 
-    // FIXME: Repeated code
     if(error_code == Err::Generating::SOURCE_DIR_INVALID)
     {
-        printf("%s%s\n%s", ERROR(), ERR_STR_SOURCE_DIR_INVALID, COLOR_RESET);
+        // FIXME: Repeated code
+        std::print("{}{}\n{}", ERROR(), ERR_STR_SOURCE_DIR_INVALID, COLOR_RESET);
         return 1;
     }
 
     if(Flags::DryRun.IsActive())
     {
         if(!Flags::debug_NoPrintout.IsActive())
-            printf("%s\n", try_GetMakefile.Data());
+            std::print("{}\n", try_GetMakefile.Data());
         return 0;
     }
 
@@ -82,7 +84,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        printf("%sUnable to write to %s!\n", ERROR(), (std::filesystem::current_path().string() + "/Makefile").c_str());
+        std::print("{}Unable to write to {}!\n", ERROR(), (std::filesystem::current_path().string() + "/Makefile").c_str());
         return 1;
     }
 
