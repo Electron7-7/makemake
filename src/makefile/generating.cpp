@@ -153,6 +153,11 @@ SafeReturn<const char*> try_GenerateDefaultMakefile()
 
     makefile += "\n";
 
+    makefile += MakeVariables::EXPORT_CLEAN_ARCH.GetLine();
+    makefile += MakeVariables::EXPORT_CLEAN_VERSION.GetLine();
+
+    makefile += "\n";
+
     makefile += MakeVariables::VPATH.GetLine();
 
     makefile += "\n";
@@ -166,8 +171,6 @@ SafeReturn<const char*> try_GenerateDefaultMakefile()
         return SafeReturn("", get_source_directories.ErrorCode());
 
     makefile += get_source_directories.Data().GetLine();
-
-    makefile += "\n";
 
     makefile += MakeVariables::CC_SRCS.GetLine();
     makefile += MakeVariables::CXX_SRCS.GetLine();
@@ -202,11 +205,47 @@ SafeReturn<const char*> try_GenerateDefaultMakefile()
     makefile += MakeTargets::TARGET_RELEASE.GetLines();
     makefile += MakeTargets::TARGET_DEBUG.GetLines();
     makefile += MakeTargets::TARGET_BUILD_DIR.GetLines();
+
+    makefile += MakeTargets::CLEAN_FUNCTIONS_COMMENT.GetLine();
+    makefile += MakeTargets::CLEAN_FUNCTION.GetLine();
+    makefile += MakeTargets::CLEAN_OBJS_FUNCTION.GetLine();
+    makefile += MakeTargets::CLEAN_DIRTY_FUNCTION.GetLine();
+    makefile += MakeTargets::CLEAN_PRINT_FUNCTION.GetLine();
+
+    makefile += "\n";
+
+    makefile += MakeTargets::CLEAN_TARGET_COMMENT.GetLine();
+    makefile += MakeTargets::TARGET_CLEAN_TARGET.GetLines();
+
+    makefile += MakeTargets::CLEAN_ALL_COMMENT.GetLine();
+    makefile += MakeTargets::TARGET_CLEAN_ALL.GetLines();
+
+    makefile += MakeTargets::CLEAN_COMMENT.GetLine();
     makefile += MakeTargets::TARGET_CLEAN.GetLines();
+
+    makefile += MakeTargets::MOSTLY_CLEAN_COMMENT.GetLine();
+    makefile += MakeTargets::TARGET_MOSTLY_CLEAN.GetLines();
+
     makefile += MakeTargets::TARGET_DISABLE_COLORS.GetLines();
+
+    makefile += MakeTargets::CXX_OBJS_COMMENT.GetLine();
     makefile += MakeTargets::TARGET_CXX_OBJS.GetLines();
+
+    makefile += MakeTargets::C_OBJS_COMMENT.GetLine();
     makefile += MakeTargets::TARGET_CC_OBJS.GetLines();
+
+    makefile += MakeTargets::PROGRAM_COMMENT.GetLine();
     makefile += MakeTargets::TARGET_PROGRAM.GetLines();
+
+    makefile += "\n";
+
+    makefile += MakeTargets::NOTHING_TO_CLEAN_COMMENT.GetLine();
+    makefile += MakeTargets::TARGET_NOTHING_TO_CLEAN.GetLines();
+
+    makefile += MakeTargets::CLEAN_PRINTOUT_COMMENT.GetLine();
+    makefile += MakeTargets::TARGET_CLEAN_PRINTOUT.GetLines();
+
+    makefile.pop_back(); // Remove the extraneous newline
 
     return SafeReturn(makefile.c_str());
 }
