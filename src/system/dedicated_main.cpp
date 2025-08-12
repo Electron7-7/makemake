@@ -8,11 +8,10 @@
 #include <filesystem>
 #include <fstream>
 
-const char* ERR_STR_SOURCE_DIR_INVALID = "The provided source directory is invalid/doesn't exist!";
+constexpr const char* ERR_STR_SOURCE_DIR_INVALID = "The provided source directory is invalid/doesn't exist!";
+constexpr const char* default_SourceCodeDirectory = "src";
+const std::string     default_ProgramName = std::filesystem::current_path().stem().string();
 
-std::string SourceCodeDirectory = "src";
-std::string ProgramName = std::filesystem::current_path().stem().c_str();
-bool makefile_already_exists = std::filesystem::exists(std::filesystem::path("Makefile"));
 
 int main(int argc, char** argv)
 {
@@ -42,13 +41,16 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    if(Options::SourceDirectory.IsActive() && Options::SourceDirectory.HasValue())
-    { SourceCodeDirectory = Options::SourceDirectory.GetValue(); }
+    if(Flags::debug_NoPrintout.IsActive())
+    { Flags::DryRun.Activate(); }
 
-    if(Options::ProgramName.IsActive() && Options::ProgramName.HasValue())
-    { ProgramName = Options::ProgramName.GetValue(); }
+    if(!Options::SourceDirectory.IsActive() || !Options::SourceDirectory.HasValue())
+    { Options::SourceDirectory.SetValue(default_SourceCodeDirectory); }
 
-    if(Flags::UpdateSourceDirs.IsActive() && makefile_already_exists)
+    if(!Options::ProgramName.IsActive() || !Options::ProgramName.HasValue())
+    { Options::ProgramName.SetValue(default_ProgramName.c_str()); }
+
+    if(Flags::UpdateSourceDirs.IsActive() && std::filesystem::exists(std::filesystem::path("Makefile")))
     {
         if(!try_UpdateSourceDirectories())
         {
