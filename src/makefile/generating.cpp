@@ -19,22 +19,22 @@ SafeReturn<make_variable_t> try_GetSourceDirectories()
     std::string longest_string = "";
     std::string src_dirs_variable("SRC_DIRS :=");
 
-    if(!std::filesystem::is_directory(SourceCodeDirectory))
+    if(!std::filesystem::is_directory(Options::SourceDirectory.GetValue()))
     {
         PRINT_ERROR("try_GetSourceDirectories - Source directory '{}' is invalid!", Options::SourceDirectory.GetValue())
         return SafeReturn(make_variable_t("", "", ""), Err::Generating::SOURCE_DIR_INVALID);
     }
 
-    for(const auto& entry : std::filesystem::recursive_directory_iterator(SourceCodeDirectory))
+    for(const auto& entry : std::filesystem::recursive_directory_iterator(Options::SourceDirectory.GetValue()))
     {
         if(entry.is_regular_file() && (entry.path().extension() == ".cpp" || entry.path().extension() == ".c"))
         {
             std::string valid_directory = entry.path().relative_path().remove_filename().generic_string();
 
-            std::string truncated_directory = valid_directory.substr(SourceCodeDirectory.size() + 1);
+            std::string truncated_directory = valid_directory.substr(std::string(Options::SourceDirectory.GetValue()).size() + 1);
             std::string final_directory = "$(SRC)/" + truncated_directory.substr(0, truncated_directory.size() - 1);
 
-            if(!valid_directory.compare(SourceCodeDirectory + "/"))
+            if(!valid_directory.compare(std::string(Options::SourceDirectory.GetValue()) + "/"))
                 final_directory.erase(final_directory.size() - 1);
 
             valid_directories.insert(final_directory);
@@ -110,7 +110,7 @@ SafeReturn<const char*> try_GenerateDefaultMakefile()
 
     makefile += "\n";
 
-    makefile += make_variable_t("NAME_BASE", ProgramName, " := ").GetLine();
+    makefile += make_variable_t("NAME_BASE", Options::ProgramName.GetValue(), " := ").GetLine();
 
     makefile += "\n";
 
@@ -157,7 +157,7 @@ SafeReturn<const char*> try_GenerateDefaultMakefile()
 
     makefile += "\n";
 
-    makefile += make_variable_t("SRC", SourceCodeDirectory.c_str(), " := ").GetLine();
+    makefile += make_variable_t("SRC", Options::SourceDirectory.GetValue(), " := ").GetLine();
 
     makefile += "\n";
 
