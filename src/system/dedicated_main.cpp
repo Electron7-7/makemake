@@ -1,6 +1,6 @@
 #include "arguments.hpp"
 #include "getargs/argument_parser.hpp"
-#include "common/labels.hpp"
+#include "common/printing.hpp"
 #include "makefile/generating.hpp"
 #include "makefile/editing.hpp"
 
@@ -43,17 +43,17 @@ int main(int argc, char** argv)
     }
 
     if(Options::SourceDirectory.IsActive() && Options::SourceDirectory.HasValue())
-        SourceCodeDirectory = Options::SourceDirectory.GetValue();
+    { SourceCodeDirectory = Options::SourceDirectory.GetValue(); }
 
     if(Options::ProgramName.IsActive() && Options::ProgramName.HasValue())
-        ProgramName = Options::ProgramName.GetValue();
+    { ProgramName = Options::ProgramName.GetValue(); }
 
     if(Flags::UpdateSourceDirs.IsActive() && makefile_already_exists)
     {
         if(!try_UpdateSourceDirectories())
         {
             // FIXME: Repeated code
-            std::print("{}{}\n{}", ERROR(), ERR_STR_SOURCE_DIR_INVALID, COLOR_RESET);
+            PRINT_ERROR("Failed to update source directory. {}", ERR_STR_SOURCE_DIR_INVALID);
             return 1;
         }
         return 0;
@@ -65,14 +65,14 @@ int main(int argc, char** argv)
     if(error_code == Err::Generating::SOURCE_DIR_INVALID)
     {
         // FIXME: Repeated code
-        std::print("{}{}\n{}", ERROR(), ERR_STR_SOURCE_DIR_INVALID, COLOR_RESET);
+        PRINT_ERROR("Failed to generate Makefile. {}", ERR_STR_SOURCE_DIR_INVALID);
         return 1;
     }
 
     if(Flags::DryRun.IsActive())
     {
         if(!Flags::debug_NoPrintout.IsActive())
-            std::print("{}\n", try_GetMakefile.Data());
+        { std::print("{}\n", try_GetMakefile.Data()); }
         return 0;
     }
 
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        std::print("{}Unable to write to {}!\n", ERROR(), (std::filesystem::current_path().string() + "/Makefile").c_str());
+        PRINT_ERROR("Unable to write to {}!", (std::filesystem::current_path().string() + "/Makefile"));
         return 1;
     }
 

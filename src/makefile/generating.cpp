@@ -1,6 +1,8 @@
 #include "generating.hpp"
 #include "system/arguments.hpp"
 #include "default_makefile.hpp"
+#include "common/printing.hpp"
+
 #include <filesystem>
 #include <set>
 
@@ -18,7 +20,10 @@ SafeReturn<make_variable_t> try_GetSourceDirectories()
     std::string src_dirs_variable("SRC_DIRS :=");
 
     if(!std::filesystem::is_directory(SourceCodeDirectory))
+    {
+        PRINT_ERROR("try_GetSourceDirectories - Source directory '{}' is invalid!", Options::SourceDirectory.GetValue())
         return SafeReturn(make_variable_t("", "", ""), Err::Generating::SOURCE_DIR_INVALID);
+    }
 
     for(const auto& entry : std::filesystem::recursive_directory_iterator(SourceCodeDirectory))
     {
