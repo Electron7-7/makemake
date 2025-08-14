@@ -2,15 +2,15 @@
 A C++ Makefile generator for simple, scalable builds.
 
 ```
-    Usage: makemake [-h|--help] [-v|--version] [-n|--dry-run] [--no-color]
-                    [-s|--source <directory>] [-l|--libraries <directory>] [-p|--name <name>]
-        -h, --help                      print help document
-        -v, --version                   print program version
-        -n, --dry-run                   print finished output instead of writing it to the Makefile
-        -u, --update                    used with -s, -l, -p, etc; updates an existing Makefile, only changing user-specified variables/targets
-        -s, --source <directory>        specify the top-level source code directory (defaults to './src')
-        -l, --libraries <directory>     specify the top-level library directory, e.g: 'src/lib' (no default)
-        -p, --name <name>               set the name of the final binary (defaults to the name of the current directory)
+Usage: makemake [-h|--help] [-v|--version] [-n|--dry-run] [--no-color]
+                [-s|--source <directory>] [-l|--libraries <directory>] [-p|--name <name>]
+    -h, --help                      print help document
+    -v, --version                   print program version
+    -n, --dry-run                   print finished output instead of writing it to the Makefile
+    -u, --update                    used with -s, -l, -p, etc; updates an existing Makefile, only changing user-specified variables/targets
+    -s, --source <directory>        specify the top-level source code directory (defaults to './src')
+    -l, --libraries <directory>     specify the top-level library directory, e.g: 'src/lib' (no default)
+    -p, --name <name>               set the name of the final binary (defaults to the name of the current directory)
 ```
 
 The default Makefile that MakeMake generates is designed to be a good starting point for projects. It includes:
