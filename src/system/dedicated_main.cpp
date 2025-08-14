@@ -11,7 +11,11 @@ constexpr const char* default_SourceCodeDirectory = "src";
 constexpr const char* default_LibrariesDirectory  = "src/lib";
 const std::string     default_ProgramName = std::filesystem::current_path().stem().string();
 
+#ifndef DEBUGGING
 const char* constant_MakefileFileName = "Makefile";
+#else
+const char* constant_MakefileFileName = "DebugMakefile.make";
+#endif // DEBUGGING
 
 int main(int argc, char** argv)
 {
