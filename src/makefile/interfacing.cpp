@@ -2,6 +2,52 @@
 #include "template.hpp"
 #include "system/arguments.hpp"
 
+bool try_SetSourceDirs()
+{
+    SRC.SetValue(Options::SourceDirectory.GetValue());
+
+    SafeReturn directories_list = try_RecursiveGetDirectoriesContainingFileTypes(SRC.GetValue(), {CPP, C});
+
+    if(directories_list.Status() != Status::NO_ERROR)
+    { return false; }
+
+    std::list<std::string> directories = directories_list.Data();
+
+    size_t first_line_length = (SRC_DIRS.GetName() + SRC_DIRS.GetSign()).size();
+    std::string longest_directory("");
+
+    for(std::string& directory : directories)
+    {
+        directory = "$(SRC)/" + directory.substr(SRC.GetValue().size() + 1);
+
+        if(directory.back() == '/') { directory.pop_back(); }
+
+        if(directory.size() > longest_directory.size())
+        { longest_directory = directory; }
+    }
+
+    int longest_directory_length = longest_directory.size() + number_of_indent_spaces;
+
+    if(longest_directory_length < first_line_length)
+    { longest_directory_length = first_line_length; }
+
+    SRC_DIRS.SetSign(SRC_DIRS.GetSign().append(longest_directory_length - first_line_length, ' ') + " \\\n");
+
+    std::string src_dir_new_value("");
+
+    for(const std::string& directory : directories)
+    {
+        std::string spaces(" ");
+        size_t number_of_spaces = (longest_directory_length - number_of_indent_spaces) - directory.size();
+        spaces.append(number_of_spaces, ' ');
+        src_dir_new_value.append(number_of_indent_spaces, ' ');
+        src_dir_new_value += (directory + spaces + "\\\n");
+    }
+
+    SRC_DIRS.SetValue(src_dir_new_value);
+    return true;
+}
+
 bool try_SetLinkerFlags()
 {
     SafeReturn<OrganizedLibraries> try_get_libraries = try_RecursiveFindLibraries();
@@ -31,6 +77,10 @@ bool try_SetLinkerFlags()
     LDFLAGS_WINDOWS.SetValue(windows_ldflags);
     return true;
 }
+
+bool try_UpdateSourceDirs()
+{ return !static_cast<bool>(try_ReplaceVariable(&SRC_DIRS, "$(SRC)/")); }
+
 bool try_UpdateLinkerFlags()
 { return !static_cast<bool>(try_ReplaceVariable(&LDFLAGS_LINUX) | try_ReplaceVariable(&LDFLAGS_WINDOWS)); }
 
