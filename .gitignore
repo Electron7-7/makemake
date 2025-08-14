@@ -1,6 +1,15 @@
+# build + clangd files
 .cache/
 build/
 compile_commands*.json
+
+# debug/test files
 *.make
 *test*
+
+# Sublime Text project+workspace files
 *.sublime-*
+
+# release archives
+*x86_64*.tar
+*x86_64*.zip

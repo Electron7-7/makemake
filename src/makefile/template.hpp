@@ -8,8 +8,8 @@ namespace MakeVariables
     static make_variable_t LINUX_CXX = { "LINUX_CXX", "clang++" , " := "  };
     static make_variable_t LINUX_CC  = { "LINUX_CC" , "clang"   , "  := " };
 
-    static make_variable_t WINDOWS_CXX_LINUX = { "WINDOWS_CXX", "i686-w64-mingw32-g++" , " := "  };
-    static make_variable_t WINDOWS_CC_LINUX  = { "WINDOWS_CC" , "i686-w64-mingw32-gcc" , "  := " };
+    static make_variable_t WINDOWS_CXX_LINUX = { "WINDOWS_CXX", "x86_64-w64-mingw32-g++" , " := "  };
+    static make_variable_t WINDOWS_CC_LINUX  = { "WINDOWS_CC" , "x86_64-w64-mingw32-gcc" , "  := " };
 
     static make_variable_t WINDOWS_CXX_WINDOWS = { "WINDOWS_CXX", "g++" , " := "  };
     static make_variable_t WINDOWS_CC_WINDOWS  = { "WINDOWS_CC" , "gcc" , "  := " };
