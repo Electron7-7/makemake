@@ -2,25 +2,25 @@ LINUX_CXX := clang++
 LINUX_CC  := clang
 
 ifneq ($(OS),Windows_NT)
-	WINDOWS_CXX := x86_64-w64-mingw32-g++
-	WINDOWS_CC  := x86_64-w64-mingw32-gcc
+	WINDOWS_CXX := i686-w64-mingw32-g++
+	WINDOWS_CC  := i686-w64-mingw32-gcc
 else
 	WINDOWS_CXX := g++
 	WINDOWS_CC  := gcc
 endif
 
-FLAGS_DEBUG_COMMON    := -g -Wall -O0 -D DEBUGGING
-FLAGS_DEBUG_LINUX     := -fsanitize=address
+FLAGS_DEBUG_COMMON    := -g -O0 -D DEBUGGING
+FLAGS_DEBUG_LINUX     := # -fsanitize=address
 FLAGS_DEBUG_WINDOWS   := # Nothing yet
 FLAGS_RELEASE_COMMON  := -O3
 FLAGS_RELEASE_WINDOWS := # Nothing yet
 FLAGS_RELEASE_LINUX   := # Nothing yet
-FLAGS_CXX_COMMON      := -std=c++23
-FLAGS_CC_COMMON       := # Nothing yet
-FLAGS_WINDOWS         := -mwindows -static
+FLAGS_CXX_COMMON      := -Wall -std=c++23
+FLAGS_CC_COMMON       := -Wall -std=c11
+FLAGS_WINDOWS         := # Nothing yet
 FLAGS_LINUX           := # Nothing yet
-LDFLAGS_LINUX         := -L src/lib -lgetargs
-LDFLAGS_WINDOWS       := -L src/lib -lgetargs
+LDFLAGS_LINUX         :=  -Lsrc/lib -lgetargs
+LDFLAGS_WINDOWS       := -lstdc++exp -Lsrc/lib -lgetargs
 
 INCLUDE := -I src -I src/include
 
@@ -62,6 +62,9 @@ export VERSION_FLAGS ?= $(RELEASE_FLAGS)
 export BUILD_DIR  ?= $(DIR_ROOT)/$(BUILD_ARCH)/$(BUILD_VERSION)
 export BUILD_OBJS ?= $(BUILD_DIR)/$(DIR_OBJS)
 
+export CLEAN_ARCH    ?= .+
+export CLEAN_VERSION ?= .+
+
 VPATH := $(SRC_DIRS)
 
 SRC := src
@@ -69,7 +72,6 @@ SRC := src
 SRC_DIRS :=         \
     $(SRC)/makefile \
     $(SRC)/system   \
-
 
 CC_SRCS  := $(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.c))
 CXX_SRCS := $(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.cpp))
@@ -88,7 +90,7 @@ export CYAN    ?= \\x1b[1;36m
 export WHITE   ?= \\x1b[1;37m
 export DEFAULT ?= \\x1b[1;39m
 
-.PHONY: build linux windows release debug build_dir clean disable_colors
+.PHONY: build linux windows release debug build_dirs .__clean_target .__clean_all clean mostlyclean disable_colors
 
 build:
 	@ printf "$(DEFAULT)::Architecture - $(BLUE)$(BUILD_ARCH)$(RESET)\n"
@@ -108,6 +110,8 @@ linux: ;@:
 	$(eval LD_FLAGS      = $(LDFLAGS_LINUX))
 	$(eval CXX_COMPILER  = $(LINUX_CXX))
 	$(eval C_COMPILER    = $(LINUX_CC))
+	$(eval TARGET_CALLED = 1)
+	$(eval CLEAN_ARCH    = $(DIR_LINUX))
 
 windows: ;@:
 	$(eval NAME          = $(NAME_BASE).exe)
@@ -119,21 +123,60 @@ windows: ;@:
 	$(eval LD_FLAGS      = $(LDFLAGS_WINDOWS))
 	$(eval CXX_COMPILER  = $(WINDOWS_CXX))
 	$(eval C_COMPILER    = $(WINDOWS_CC))
+	$(eval TARGET_CALLED = 1)
+	$(eval CLEAN_ARCH    = $(DIR_WINDOWS))
 
 release: ;@:
 	$(eval VERSION_FLAGS = $(RELEASE_FLAGS))
 	$(eval BUILD_VERSION = $(DIR_RELEASE))
+	$(eval TARGET_CALLED = 1)
+	$(eval CLEAN_VERSION = $(DIR_RELEASE))
 
 debug: ;@:
 	$(eval VERSION_FLAGS = $(DEBUG_FLAGS))
 	$(eval BUILD_VERSION = $(DIR_DEBUG))
+	$(eval TARGET_CALLED = 1)
+	$(eval CLEAN_VERSION = $(DIR_DEBUG))
 
-build_dir:
-	@ -mkdir -p $(BUILD_DIR) $(BUILD_OBJS)
+build_dirs:
+	@ -mkdir -p $(BUILD_DIR)
 
+# Cleaning Functions
+CLEAN       = find $(DIR_ROOT) -type $(1) $(2) -not -path "*.git/*" -delete -print 2>/dev/null
+CLEAN_OBJS  = $(call CLEAN,$(1),-regex '.+\.objs_.+/.+' $(2))
+CLEAN_DIRTY = $(call CLEAN_OBJS,$(1),$(DIRTY_SRC_DIRS:%=-not -path "*%*"))
+CLEAN_PRINT = \
+$(eval MAKE_TARGET != if [[ -n "$(1)" && "$(1)" != " " ]]; then printf "$(1)"; else printf "NOTHING_TO_CLEAN"; fi) \
+$(MAKE) -s $(foreach cleaned,$(MAKE_TARGET),$(cleaned).clean)
+
+# Cleans directories based on previous targets
+# (e.g: 'make windows clean' will clean 'build/Windows/', but 'make windows debug clean' will only clean 'build/Windows/Debug/')
+.__clean_target: ;@:
+	$(eval CLEAN_FILES != $(call CLEAN,f,-regex '$(DIR_ROOT)/$(CLEAN_ARCH)/$(CLEAN_VERSION)/.*'))
+	$(eval CLEAN_DIRS  != $(call CLEAN,d,-regex '$(DIR_ROOT)/$(CLEAN_ARCH)/$(CLEAN_VERSION)'))
+	$(eval EMPTY_DIRS  != $(call CLEAN,d,-empty -regex '$(DIR_ROOT)/$(CLEAN_ARCH)'))
+	@ $(call CLEAN_PRINT,$(EMPTY_DIRS))
+
+# Cleans the entire 'build/' directory (default behaviour for 'clean')
+.__clean_all: ;@:
+	$(eval CLEAN_FILES != $(call CLEAN,f,-regex '$(DIR_ROOT)/.*'))
+	$(eval CLEAN_DIRS  != $(call CLEAN,d,-regex '$(DIR_ROOT)/.*'))
+	$(eval EMPTY_DIR   != find ./ -type d -not -path "*.git*" -empty -delete -print 2>/dev/null)
+	@ $(call CLEAN_PRINT,$(EMPTY_DIR))
+
+# What 'clean' does depends on if it's called by itself, or after other targets
 clean:
-	@ -rm -rf $(DIR_ROOT)
-	@ printf "::Cleaned $(RED)$(DIR_ROOT)/$(RESET)\n"
+	@ if [ "$(TARGET_CALLED)" == "1" ]; then \
+	    $(MAKE) -s .__clean_target;          \
+	else                                     \
+	    $(MAKE) -s .__clean_all;             \
+	fi
+
+# 'mostlyclean' doesn't clean files from 'DIRTY_SRC_DIRS'
+mostlyclean:
+	$(eval CLEAN_FILES != $(call CLEAN_DIRTY,f))
+	$(eval CLEAN_DIRS  != $(call CLEAN_DIRTY,d -empty))
+	@ $(call CLEAN_PRINT, $(CLEAN_FILES)$(CLEAN_DIRS))
 
 disable_colors:
 	$(eval RESET   := "")
@@ -148,16 +191,28 @@ disable_colors:
 	$(eval DEFAULT := "")
 	@ printf "::Output colors disabled\n"
 
-$(BUILD_OBJS)/%.obj: $(SRC)/%.cpp | build_dir
+# C++ Object Files
+$(BUILD_OBJS)/%.obj: $(SRC)/%.cpp | build_dirs
 	@ printf "::Compiling $(BLUE)$@$(RESET)\n"
 	@ -mkdir -p $(dir $@)
 	$(CXX_COMPILER) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@
 
-$(BUILD_OBJS)/%.o: $(SRC)/%.c | build_dir
+# C Object Files
+$(BUILD_OBJS)/%.o: $(SRC)/%.c | build_dirs
 	@ printf "::Compiling $(BLUE)$@$(RESET)\n"
 	@ -mkdir -p $(dir $@)
 	$(C_COMPILER) $(CC_FLAGS) $(VERSION_FLAGS) $(INCLUDE) -c $< -o $@
 
+# Program Linking
 $(BUILD_DIR)/$(NAME): $(CC_OBJS) $(CXX_OBJS)
-	@ printf "::Linking $(CYAN)$@$(RESET)\n"
+	@ printf "::Linking $(GREEN)$@$(RESET)\n"
 	$(CXX_COMPILER) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) $^ -o $@ $(LD_FLAGS)
+
+
+# Prints a unique cleanup message
+NOTHING_TO_CLEAN.clean:
+	@ printf "::Nothing left to clean\n"
+
+# Prints a cleanup message
+%.clean:
+	@ printf "::Cleaned $(RED)$*$(RESET)\n"

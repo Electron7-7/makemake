@@ -3,38 +3,36 @@
 
 #include "getargs/argument.hpp"
 
-#include <string>
-
 namespace Flags
 {
-    static Flag Help             ("--help", "-h");
-    static Flag Version          ("--version", "-v");
-    static Flag DryRun           ("--dry-run", "-n");
-    static Flag NoColor          ("--no-color");
-    static Flag UpdateSourceDirs ("--update-source-dirs", "-u");
+    inline Flag Help    ("--help"    , "-h");
+    inline Flag Version ("--version" , "-v");
+    inline Flag DryRun  ("--dry-run" , "-n");
+    inline Flag NoColor ("--no-color"      );
+    inline Flag Update  ("--update"  , "-u");
 
-    static Flag debug_NoPrintout("--no-printout");
+    inline Flag debug_NoPrintout ("--no-printouts");
 }
 
 namespace Options
 {
-    static Option SourceDirectory ("--source", "-s");
-    static Option ProgramName     ("--name", "-p");
+    inline Option SourceDirectory ("--source"   , "-s");
+    inline Option ProgramName     ("--name"     , "-p");
+    inline Option Libraries       ("--libraries", "-l");
 }
 
 constexpr const char* _Help_Printout =
-
-R"~(    Usage: makemake [-hvn] [--no-color] [-s|--source <source_code_dir>] [-p|--name <global_ProgramName>]
-        -h, --help                  print help document
-        -v, --version               print program version
-        -n, --dry-run               print the generated Makefile instead of creating/replacing it
-        -s, --source SOURCEDIR      set the source code directory (defaults to 'src')
-        -u, --update-source-dirs    only update the source directories in an existing Makefile (generates a new Makefile if none exists)
-        -p, --name NAME             set the name of the final binary (defaults to the name of the current directory)
+R"~(    Usage: makemake [-h|--help] [-v|--version] [-n|--dry-run] [--no-color]
+                    [-s|--source <directory>] [-l|--libraries <directory>] [-p|--name <name>]
+        -h, --help                      print help document
+        -v, --version                   print program version
+        -n, --dry-run                   print finished output instead of writing it to the Makefile
+        -u, --update                    used with -s, -l, -p, etc; updates an existing Makefile, only changing user-specified variables/targets
+        -s, --source <directory>        specify the top-level source code directory (defaults to './src')
+        -l, --libraries <directory>     specify the top-level library directory, e.g: 'src/lib' (no default)
+        -p, --name <name>               set the name of the final binary (defaults to the name of the current directory)
 )~";
 
-constexpr const char* _Version_Printout = "makemake v2.1.2";
+constexpr const char* _Version_Printout = "makemake v2.3.2";
 
-extern std::string SourceCodeDirectory;
-extern std::string ProgramName;
 #endif // ARGUMENTS_H

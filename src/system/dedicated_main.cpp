@@ -1,17 +1,21 @@
 #include "arguments.hpp"
 #include "getargs/argument_parser.hpp"
-#include "common/labels.hpp"
-#include "makefile/generating.hpp"
-#include "makefile/editing.hpp"
+#include "common/printing.hpp"
+#include "makefile/interfacing.hpp"
 
+#include <print>
 #include <filesystem>
 #include <fstream>
 
-const char* ERR_STR_SOURCE_DIR_INVALID = "The provided source directory is invalid/doesn't exist!";
+constexpr const char* default_SourceCodeDirectory = "src";
+constexpr const char* default_LibrariesDirectory  = "src/lib";
+const std::string     default_ProgramName = std::filesystem::current_path().stem().string();
 
-std::string SourceCodeDirectory = "src";
-std::string ProgramName = std::filesystem::current_path().stem().c_str();
-bool makefile_already_exists = std::filesystem::exists(std::filesystem::path("Makefile"));
+#ifndef DEBUGGING
+const char* constant_MakefileFileName = "Makefile";
+#else
+const char* constant_MakefileFileName = "DebugMakefile.make";
+#endif // DEBUGGING
 
 int main(int argc, char** argv)
 {
@@ -19,72 +23,82 @@ int main(int argc, char** argv)
     global_ArgumentParser->AddFlag(&Flags::Help);
     global_ArgumentParser->AddFlag(&Flags::Version);
     global_ArgumentParser->AddFlag(&Flags::DryRun);
-    global_ArgumentParser->AddFlag(&Flags::UpdateSourceDirs);
+    global_ArgumentParser->AddFlag(&Flags::Update);
     global_ArgumentParser->AddFlag(&Flags::debug_NoPrintout);
 
     // Add valid options
     global_ArgumentParser->AddOption(&Options::SourceDirectory);
     global_ArgumentParser->AddOption(&Options::ProgramName);
+    global_ArgumentParser->AddOption(&Options::Libraries);
 
     // Parse all arguments
     global_ArgumentParser->ParseArguments(argc, argv);
 
     if(Flags::Help.IsActive())
     {
-        printf("%s\n    %s\n", _Help_Printout, _Version_Printout);
+        std::print("{}\n    {}\n", _Help_Printout, _Version_Printout);
         return 0;
     }
 
     if(Flags::Version.IsActive())
     {
-        printf("    %s\n", _Version_Printout);
+        std::print("    {}\n", _Version_Printout);
         return 0;
     }
 
-    if(Options::SourceDirectory.IsActive() && Options::SourceDirectory.HasValue())
-        SourceCodeDirectory = Options::SourceDirectory.GetValue();
+    if(Flags::debug_NoPrintout.IsActive())
+    { Flags::DryRun.Activate(); }
 
-    if(Options::ProgramName.IsActive() && Options::ProgramName.HasValue())
-        ProgramName = Options::ProgramName.GetValue();
+    if(!Options::SourceDirectory.HasValue())
+    { Options::SourceDirectory.SetValue(default_SourceCodeDirectory); }
 
-    if(Flags::UpdateSourceDirs.IsActive() && makefile_already_exists)
+    if(!Options::ProgramName.HasValue())
+    { Options::ProgramName.SetValue(default_ProgramName.c_str()); }
+
+    if(!Options::Libraries.HasValue())
+    { Options::Libraries.SetValue(default_LibrariesDirectory); }
+
+    if(Flags::Update.IsActive())
     {
-        if(!try_UpdateSourceDirectories())
+        if(Options::SourceDirectory.IsActive())
         {
-            printf("%s%s\n%s", ERROR(), ERR_STR_SOURCE_DIR_INVALID, COLOR_RESET);
-            return 1;
+            if(!try_SetSourceDirs())
+            { PRINT_ERROR("Failed to find source directory '{}'", Options::SourceDirectory.GetValue()); }
+            else
+            { try_UpdateSourceDirs(); }
         }
-        return 0;
+
+        if(Options::Libraries.IsActive())
+        {
+            if(!try_SetLinkerFlags())
+            { PRINT_ERROR("Failed to find libraries at '{}'", Options::Libraries.GetValue()); }
+            else
+            { try_UpdateLinkerFlags(); }
+        }
+
+        return 0; // FIXME: Return '1' if all the update functions fail
     }
 
-    SafeReturn try_GetMakefile = try_GenerateDefaultMakefile();
-    ErrCode error_code = try_GetMakefile.ErrorCode();
-
-    // FIXME: Repeated code
-    if(error_code == Err::Generating::SOURCE_DIR_INVALID)
-    {
-        printf("%s%s\n%s", ERROR(), ERR_STR_SOURCE_DIR_INVALID, COLOR_RESET);
-        return 1;
-    }
+    GenerateDefaultMakefile();
 
     if(Flags::DryRun.IsActive())
     {
         if(!Flags::debug_NoPrintout.IsActive())
-            printf("%s\n", try_GetMakefile.Data());
+        { std::print("{}\n", GetMakefileBuffer()); }
         return 0;
     }
 
-    std::ofstream makefile("Makefile");
+    std::ofstream makefile(constant_MakefileFileName);
     if(makefile)
     {
-        makefile << try_GetMakefile.Data();
-        makefile.close();
+        makefile << GetMakefileBuffer();
     }
     else
     {
-        printf("%sUnable to write to %s!\n", ERROR(), (std::filesystem::current_path().string() + "/Makefile").c_str());
+        PRINT_ERROR("Unable to write to {}!", std::filesystem::absolute(constant_MakefileFileName).generic_string());
         return 1;
     }
 
+    makefile.close(); // FIXME: I don't know if you also need to call 'close' when the filestream fails
     return 0;
 }

@@ -40,3 +40,10 @@ I JUST MANAGED TO FINISH IN UNDER AN HOUR!! WOOOOO!!
 I want to implement more ways of "updating" the Makefile. Specifically, I want to add a flag for changing the C/C++ standards.
 
 Well, I didn't do that but I did update the "update source directories" functionality to not only be its own function but to also be much much MUCH better at what it does.
+
+[08/13/25]
+I want to finish my work on the overhaul and wrap this all up in a neat bow.
+
+First off, I want to make sure that duplicate library directories are ignored. I can do that with `std::list::sort` followed by `std::list::unique`.
+
+Welp, I finally finished! I still have lots to do, but for now I'm pretty happy with how this program has turned out.

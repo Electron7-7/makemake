@@ -1,31 +1,31 @@
 #ifndef MAKEFILE_TEMPLATE_H
 #define MAKEFILE_TEMPLATE_H
 
-#include "makefile/data_types.hpp"
+#include "data_types.hpp"
 
 namespace MakeVariables
 {
     static make_variable_t LINUX_CXX = { "LINUX_CXX", "clang++" , " := "  };
     static make_variable_t LINUX_CC  = { "LINUX_CC" , "clang"   , "  := " };
 
-    static make_variable_t WINDOWS_CXX_LINUX = { "WINDOWS_CXX", "x86_64-w64-mingw32-g++" , " := "  };
-    static make_variable_t WINDOWS_CC_LINUX  = { "WINDOWS_CC" , "x86_64-w64-mingw32-gcc" , "  := " };
+    static make_variable_t WINDOWS_CXX_LINUX = { "WINDOWS_CXX", "i686-w64-mingw32-g++" , " := "  };
+    static make_variable_t WINDOWS_CC_LINUX  = { "WINDOWS_CC" , "i686-w64-mingw32-gcc" , "  := " };
 
     static make_variable_t WINDOWS_CXX_WINDOWS = { "WINDOWS_CXX", "g++" , " := "  };
     static make_variable_t WINDOWS_CC_WINDOWS  = { "WINDOWS_CC" , "gcc" , "  := " };
 
-    static make_variable_t FLAGS_DEBUG_COMMON    = { "FLAGS_DEBUG_COMMON"    , "-g -Wall -O0 -D DEBUGGING" , "    := "        };
+    static make_variable_t FLAGS_DEBUG_COMMON    = { "FLAGS_DEBUG_COMMON"    , "-O0 -D DEBUGGING"          , "    := "        };
     static make_variable_t FLAGS_DEBUG_LINUX     = { "FLAGS_DEBUG_LINUX"     , "-fsanitize=address"        , "     := "       };
-    static make_variable_t FLAGS_DEBUG_WINDOWS   = { "FLAGS_DEBUG_WINDOWS"   , "# Nothing yet"             , "   := "         };
+    static make_variable_t FLAGS_DEBUG_WINDOWS   = { "FLAGS_DEBUG_WINDOWS"   , make_variable_t::EMPTY      , "   := "         };
     static make_variable_t FLAGS_RELEASE_COMMON  = { "FLAGS_RELEASE_COMMON"  , "-O3"                       , "  := "          };
-    static make_variable_t FLAGS_RELEASE_WINDOWS = { "FLAGS_RELEASE_WINDOWS" , "# Nothing yet"             , " := "           };
-    static make_variable_t FLAGS_RELEASE_LINUX   = { "FLAGS_RELEASE_LINUX"   , "# Nothing yet"             , "   := "         };
-    static make_variable_t FLAGS_CXX_COMMON      = { "FLAGS_CXX_COMMON"      , "-std=c++20"                , "      := "      };
-    static make_variable_t FLAGS_CC_COMMON       = { "FLAGS_CC_COMMON"       , "# Nothing yet"             , "       := "     };
-    static make_variable_t FLAGS_WINDOWS         = { "FLAGS_WINDOWS"         , "-mwindows -static"         , "         := "   };
-    static make_variable_t FLAGS_LINUX           = { "FLAGS_LINUX"           , "# Nothing yet"             , "           := " };
-    static make_variable_t LDFLAGS_LINUX         = { "LDFLAGS_LINUX"         , "# Nothing yet"             , "         := "   };
-    static make_variable_t LDFLAGS_WINDOWS       = { "LDFLAGS_WINDOWS"       , "# Nothing yet"             , "       := "     };
+    static make_variable_t FLAGS_RELEASE_WINDOWS = { "FLAGS_RELEASE_WINDOWS" , make_variable_t::EMPTY      , " := "           };
+    static make_variable_t FLAGS_RELEASE_LINUX   = { "FLAGS_RELEASE_LINUX"   , make_variable_t::EMPTY      , "   := "         };
+    static make_variable_t FLAGS_CXX_COMMON      = { "FLAGS_CXX_COMMON"      , "-Wall -std=c++23"          , "      := "      };
+    static make_variable_t FLAGS_CC_COMMON       = { "FLAGS_CC_COMMON"       , "-Wall -std=c11"            , "       := "     };
+    static make_variable_t FLAGS_WINDOWS         = { "FLAGS_WINDOWS"         , make_variable_t::EMPTY      , "         := "   };
+    static make_variable_t FLAGS_LINUX           = { "FLAGS_LINUX"           , make_variable_t::EMPTY      , "           := " };
+    static make_variable_t LDFLAGS_LINUX         = { "LDFLAGS_LINUX"         , make_variable_t::EMPTY      , "         := "   };
+    static make_variable_t LDFLAGS_WINDOWS       = { "LDFLAGS_WINDOWS"       , "-lstdc++exp"               , "       := "     };
 
     static make_variable_t INCLUDE = { "INCLUDE", "-I src", " := " };
 
@@ -35,6 +35,8 @@ namespace MakeVariables
     static make_variable_t DIR_DEBUG   = { "DIR_DEBUG"   , "Debug"   , "   := "  };
     static make_variable_t DIR_RELEASE = { "DIR_RELEASE" , "Release" , " := "    };
     static make_variable_t DIR_OBJS    = { "DIR_OBJS"    , ".objs"   , "    := " };
+
+    static make_variable_t NAME_BASE   = { "NAME_BASE", "", " := " };
 
     namespace IfOnLinux
     {
@@ -68,7 +70,14 @@ namespace MakeVariables
     static make_variable_t EXPORT_BUILD_DIR  = { "BUILD_DIR" , "$(DIR_ROOT)/$(BUILD_ARCH)/$(BUILD_VERSION)" , "  ?= ", true };
     static make_variable_t EXPORT_BUILD_OBJS = { "BUILD_OBJS", "$(BUILD_DIR)/$(DIR_OBJS)"                   , " ?= " , true };
 
+    static make_variable_t EXPORT_CLEAN_ARCH    = { "CLEAN_ARCH",    ".+", "    ?= ", true };
+    static make_variable_t EXPORT_CLEAN_VERSION = { "CLEAN_VERSION", ".+", " ?= "   , true };
+
     static make_variable_t VPATH = { "VPATH", "$(SRC_DIRS)", " := " };
+
+    static make_variable_t SRC = { "SRC", "", " := " };
+
+    static make_variable_t SRC_DIRS = { "SRC_DIRS", "", " :=" }; // This variable will never be left in its default state
 
     static make_variable_t CC_SRCS  = { "CC_SRCS" , "$(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.c))"   , "  := " };
     static make_variable_t CXX_SRCS = { "CXX_SRCS", "$(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.cpp))" , " := "  };
@@ -87,7 +96,7 @@ namespace MakeVariables
     static make_variable_t EXPORT_WHITE   = { "WHITE"   , "\\\\x1b[1;37m" , "   ?= "   , true };
     static make_variable_t EXPORT_DEFAULT = { "DEFAULT" , "\\\\x1b[1;39m" , " ?= "     , true };
 
-    static make_variable_t PHONY = { ".PHONY", "build linux windows release debug build_dir clean disable_colors" , ": " };
+    static make_variable_t PHONY = { ".PHONY", "build linux windows release debug build_dirs .__clean_target .__clean_all clean mostlyclean disable_colors" , ": " };
 }
 
 namespace MakeTargets
@@ -118,6 +127,8 @@ namespace MakeTargets
             "$(eval LD_FLAGS      = $(LDFLAGS_LINUX))",
             "$(eval CXX_COMPILER  = $(LINUX_CXX))",
             "$(eval C_COMPILER    = $(LINUX_CC))",
+            "$(eval TARGET_CALLED = 1)",
+            "$(eval CLEAN_ARCH    = $(DIR_LINUX))",
         }
     };
 
@@ -134,6 +145,8 @@ namespace MakeTargets
             "$(eval LD_FLAGS      = $(LDFLAGS_WINDOWS))",
             "$(eval CXX_COMPILER  = $(WINDOWS_CXX))",
             "$(eval C_COMPILER    = $(WINDOWS_CC))",
+            "$(eval TARGET_CALLED = 1)",
+            "$(eval CLEAN_ARCH    = $(DIR_WINDOWS))",
         }
     };
 
@@ -143,6 +156,8 @@ namespace MakeTargets
         {
             "$(eval VERSION_FLAGS = $(RELEASE_FLAGS))",
             "$(eval BUILD_VERSION = $(DIR_RELEASE))",
+            "$(eval TARGET_CALLED = 1)",
+            "$(eval CLEAN_VERSION = $(DIR_RELEASE))",
         }
     };
 
@@ -152,21 +167,68 @@ namespace MakeTargets
         {
             "$(eval VERSION_FLAGS = $(DEBUG_FLAGS))",
             "$(eval BUILD_VERSION = $(DIR_DEBUG))",
+            "$(eval TARGET_CALLED = 1)",
+            "$(eval CLEAN_VERSION = $(DIR_DEBUG))",
         }
     };
 
     static make_target_t TARGET_BUILD_DIR =
     {
-        "build_dir:",
-        { "@ -mkdir -p $(BUILD_DIR) $(BUILD_OBJS)" }
+        "build_dirs:",
+        { "@ -mkdir -p $(BUILD_DIR)" }
     };
 
+    static make_variable_t CLEAN_FUNCTIONS_COMMENT = { "# Cleaning Functions", "", "" };
+    static make_variable_t CLEAN_FUNCTION          = { "CLEAN",       R"~(find $(DIR_ROOT) -type $(1) $(2) -not -path "*.git/*" -delete -print 2>/dev/null)~", "       = " };
+    static make_variable_t CLEAN_OBJS_FUNCTION     = { "CLEAN_OBJS",  R"~($(call CLEAN,$(1),-regex '.+\.objs_.+/.+' $(2)))~", "  = " };
+    static make_variable_t CLEAN_DIRTY_FUNCTION    = { "CLEAN_DIRTY", R"~($(call CLEAN_OBJS,$(1),$(DIRTY_SRC_DIRS:%=-not -path "*%*")))~", " = " };
+    static make_variable_t CLEAN_PRINT_FUNCTION    = { "CLEAN_PRINT", "\n" R"~($(eval MAKE_TARGET != if [[ -n "$(1)" && "$(1)" != " " ]]; then printf "$(1)"; else printf "NOTHING_TO_CLEAN"; fi) \)~" "\n" R"~($(MAKE) -s $(foreach cleaned,$(MAKE_TARGET),$(cleaned).clean))~", " = \\" };
+
+    static make_variable_t CLEAN_TARGET_COMMENT = { R"~(# Cleans directories based on previous targets)~" "\n" R"~(# (e.g: 'make windows clean' will clean 'build/Windows/', but 'make windows debug clean' will only clean 'build/Windows/Debug/'))~", "", "" };
+    static make_target_t TARGET_CLEAN_TARGET =
+    {
+        ".__clean_target: ;@:",
+        {
+            R"~($(eval CLEAN_FILES != $(call CLEAN,f,-regex '$(DIR_ROOT)/$(CLEAN_ARCH)/$(CLEAN_VERSION)/.*')))~",
+            R"~($(eval CLEAN_DIRS  != $(call CLEAN,d,-regex '$(DIR_ROOT)/$(CLEAN_ARCH)/$(CLEAN_VERSION)')))~",
+            R"~($(eval EMPTY_DIRS  != $(call CLEAN,d,-empty -regex '$(DIR_ROOT)/$(CLEAN_ARCH)')))~",
+            R"~(@ $(call CLEAN_PRINT,$(EMPTY_DIRS)))~",
+        }
+    };
+
+    static make_variable_t CLEAN_ALL_COMMENT = { "# Cleans the entire 'build/' directory (default behaviour for 'clean')", "", "" };
+    static make_target_t TARGET_CLEAN_ALL =
+    {
+        ".__clean_all: ;@:",
+        {
+            R"~($(eval CLEAN_FILES != $(call CLEAN,f,-regex '$(DIR_ROOT)/.*')))~",
+            R"~($(eval CLEAN_DIRS  != $(call CLEAN,d,-regex '$(DIR_ROOT)/.*')))~",
+            R"~($(eval EMPTY_DIR   != find ./ -type d -not -path "*.git*" -empty -delete -print 2>/dev/null))~",
+            R"~(@ $(call CLEAN_PRINT,$(EMPTY_DIR)))~",
+        }
+    };
+
+    static make_variable_t CLEAN_COMMENT = { R"~(# What 'clean' does depends on if it's called by itself, or after other targets)~", "", "" };
     static make_target_t TARGET_CLEAN =
     {
         "clean:",
         {
-            R"~(@ -rm -rf $(DIR_ROOT))~",
-            R"~(@ printf "::Cleaned $(RED)$(DIR_ROOT)/$(RESET)\n")~",
+            R"~(@ if [ "$(TARGET_CALLED)" == "1" ]; then \)~",
+            R"~(    $(MAKE) -s .__clean_target;          \)~",
+            R"~(else                                     \)~",
+            R"~(    $(MAKE) -s .__clean_all;             \)~",
+            R"~(fi)~"
+        }
+    };
+
+    static make_variable_t MOSTLY_CLEAN_COMMENT = { R"~(# 'mostlyclean' doesn't clean files from 'DIRTY_SRC_DIRS')~", "", "" };
+    static make_target_t TARGET_MOSTLY_CLEAN =
+    {
+        "mostlyclean:",
+        {
+            R"~($(eval CLEAN_FILES != $(call CLEAN_DIRTY,f)))~",
+            R"~($(eval CLEAN_DIRS  != $(call CLEAN_DIRTY,d -empty)))~",
+            R"~(@ $(call CLEAN_PRINT, $(CLEAN_FILES)$(CLEAN_DIRS)))~",
         }
     };
 
@@ -188,9 +250,10 @@ namespace MakeTargets
         }
     };
 
+    static make_variable_t CXX_OBJS_COMMENT = { "# C++ Object Files", "", "" };
     static make_target_t TARGET_CXX_OBJS =
     {
-        R"~($(BUILD_OBJS)/%.obj: $(SRC)/%.cpp | build_dir)~",
+        R"~($(BUILD_OBJS)/%.obj: $(SRC)/%.cpp | build_dirs)~",
         {
             R"~(@ printf "::Compiling $(BLUE)$@$(RESET)\n")~",
             R"~(@ -mkdir -p $(dir $@))~",
@@ -198,9 +261,10 @@ namespace MakeTargets
         }
     };
 
+    static make_variable_t C_OBJS_COMMENT = { "# C Object Files", "", "" };
     static make_target_t TARGET_CC_OBJS =
     {
-        R"~($(BUILD_OBJS)/%.o: $(SRC)/%.c | build_dir)~",
+        R"~($(BUILD_OBJS)/%.o: $(SRC)/%.c | build_dirs)~",
         {
             R"~(@ printf "::Compiling $(BLUE)$@$(RESET)\n")~",
             R"~(@ -mkdir -p $(dir $@))~",
@@ -208,12 +272,31 @@ namespace MakeTargets
         }
     };
 
+    static make_variable_t PROGRAM_COMMENT = { "# Program Linking", "", "" };
     static make_target_t TARGET_PROGRAM =
     {
         R"~($(BUILD_DIR)/$(NAME): $(CC_OBJS) $(CXX_OBJS))~",
         {
-            R"~(@ printf "::Linking $(CYAN)$@$(RESET)\n")~",
+            R"~(@ printf "::Linking $(GREEN)$@$(RESET)\n")~",
             R"~($(CXX_COMPILER) $(CXX_FLAGS) $(VERSION_FLAGS) $(INCLUDE) $^ -o $@ $(LD_FLAGS))~",
+        }
+    };
+
+    static make_variable_t NOTHING_TO_CLEAN_COMMENT = { "# Prints a unique cleanup message", "", "" };
+    static make_target_t TARGET_NOTHING_TO_CLEAN =
+    {
+        R"~(NOTHING_TO_CLEAN.clean:)~",
+        {
+            R"~(@ printf "::Nothing left to clean\n")~",
+        }
+    };
+
+    static make_variable_t CLEAN_PRINTOUT_COMMENT = { "# Prints a cleanup message", "", "" };
+    static make_target_t TARGET_CLEAN_PRINTOUT =
+    {
+        R"~(%.clean:)~",
+        {
+            R"~(@ printf "::Cleaned $(RED)$*$(RESET)\n")~",
         }
     };
 }
