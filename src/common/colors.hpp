@@ -40,15 +40,15 @@ struct Color
         constexpr static const char* White   = "\x1b[47m";
         constexpr static const char* Default = "\x1b[49m";
 
-        constexpr static const char* BlackBold   = "\x1b[2;40m";
-        constexpr static const char* RedBold     = "\x1b[2;41m";
-        constexpr static const char* GreenBold   = "\x1b[2;42m";
-        constexpr static const char* YellowBold  = "\x1b[2;43m";
-        constexpr static const char* BlueBold    = "\x1b[2;44m";
-        constexpr static const char* MagentaBold = "\x1b[2;45m";
-        constexpr static const char* CyanBold    = "\x1b[2;46m";
-        constexpr static const char* WhiteBold   = "\x1b[2;47m";
-        constexpr static const char* DefaultBold = "\x1b[2;49m";
+        constexpr static const char* BlackBold   = "\x1b[1;40m";
+        constexpr static const char* RedBold     = "\x1b[1;41m";
+        constexpr static const char* GreenBold   = "\x1b[1;42m";
+        constexpr static const char* YellowBold  = "\x1b[1;43m";
+        constexpr static const char* BlueBold    = "\x1b[1;44m";
+        constexpr static const char* MagentaBold = "\x1b[1;45m";
+        constexpr static const char* CyanBold    = "\x1b[1;46m";
+        constexpr static const char* WhiteBold   = "\x1b[1;47m";
+        constexpr static const char* DefaultBold = "\x1b[1;49m";
     };
 };
 
