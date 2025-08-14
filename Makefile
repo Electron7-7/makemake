@@ -9,8 +9,8 @@ else
 	WINDOWS_CC  := gcc
 endif
 
-FLAGS_DEBUG_COMMON    := -O0 -D DEBUGGING
-FLAGS_DEBUG_LINUX     := -fsanitize=address
+FLAGS_DEBUG_COMMON    := -g -O0 -D DEBUGGING
+FLAGS_DEBUG_LINUX     := # -fsanitize=address
 FLAGS_DEBUG_WINDOWS   := # Nothing yet
 FLAGS_RELEASE_COMMON  := -O3
 FLAGS_RELEASE_WINDOWS := # Nothing yet
@@ -19,10 +19,10 @@ FLAGS_CXX_COMMON      := -Wall -std=c++23
 FLAGS_CC_COMMON       := -Wall -std=c11
 FLAGS_WINDOWS         := # Nothing yet
 FLAGS_LINUX           := # Nothing yet
-LDFLAGS_LINUX         := -Lsrc/lib -lgetargs
+LDFLAGS_LINUX         :=  -Lsrc/lib -lgetargs
 LDFLAGS_WINDOWS       := -lstdc++exp -Lsrc/lib -lgetargs
 
-INCLUDE := -I src
+INCLUDE := -I src -I src/include
 
 DIR_ROOT    := build
 DIR_LINUX   := Linux
