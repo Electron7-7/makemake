@@ -104,6 +104,10 @@ bool try_SetLinkerFlags()
     for(const std::string& library : libraries.windows_library_files)
     { windows_ldflags.append(" -l" + library); }
 
+    // Remove the leading space (there's probably a better way of doing this. Too bad!)
+    if(linux_ldflags.at(0) == ' ') { linux_ldflags.erase(linux_ldflags.cbegin()); }
+    if(windows_ldflags.at(0) == ' ') { windows_ldflags.erase(windows_ldflags.cbegin()); }
+
     LDFLAGS_LINUX.SetValue(linux_ldflags);
     LDFLAGS_WINDOWS.SetValue(windows_ldflags);
     return true;
