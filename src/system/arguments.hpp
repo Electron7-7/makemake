@@ -33,6 +33,6 @@ R"~(    Usage: makemake [-h|--help] [-v|--version] [-n|--dry-run] [--no-color]
         -p, --name <name>               set the name of the final binary (defaults to the name of the current directory)
 )~";
 
-constexpr const char* _Version_Printout = "makemake v2.3.3";
+constexpr const char* _Version_Printout = "makemake v2.3.5";
 
 #endif // ARGUMENTS_H
