@@ -1,7 +1,7 @@
 #ifndef MAKEFILE_TEMPLATE_H
 #define MAKEFILE_TEMPLATE_H
 
-#include "makefile/data_types.hpp"
+#include "data_types.hpp"
 
 namespace MakeVariables
 {
@@ -35,6 +35,8 @@ namespace MakeVariables
     static make_variable_t DIR_DEBUG   = { "DIR_DEBUG"   , "Debug"   , "   := "  };
     static make_variable_t DIR_RELEASE = { "DIR_RELEASE" , "Release" , " := "    };
     static make_variable_t DIR_OBJS    = { "DIR_OBJS"    , ".objs"   , "    := " };
+
+    static make_variable_t NAME_BASE   = { "NAME_BASE", "", " := " };
 
     namespace IfOnLinux
     {
@@ -72,6 +74,10 @@ namespace MakeVariables
     static make_variable_t EXPORT_CLEAN_VERSION = { "CLEAN_VERSION", ".+", " ?= "   , true };
 
     static make_variable_t VPATH = { "VPATH", "$(SRC_DIRS)", " := " };
+
+    static make_variable_t SRC = { "SRC", "", " := " };
+
+    static make_variable_t SRC_DIRS = { "SRC_DIRS", "", " :=" }; // This variable will never be left in its default state
 
     static make_variable_t CC_SRCS  = { "CC_SRCS" , "$(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.c))"   , "  := " };
     static make_variable_t CXX_SRCS = { "CXX_SRCS", "$(foreach directory,$(SRC_DIRS),$(wildcard $(directory)/*.cpp))" , " := "  };
