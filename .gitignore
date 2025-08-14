@@ -1,4 +1,6 @@
 .cache/
 build/
 compile_commands*.json
-Backup.make
+*.make
+*test*
+*.sublime-*
