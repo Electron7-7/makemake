@@ -1,6 +1,37 @@
 #include "interfacing.hpp"
 #include "template.hpp"
 #include "system/arguments.hpp"
+#include "system/filesystem.hpp"
+#include "common/printing.hpp"
+#include "common/colors.hpp"
+
+#include <fstream>
+#include <sstream>
+#include <filesystem>
+
+namespace FileSys = std::filesystem; // Look, I'm lazy and 'std::filesystem' takes up so much fucking space to type out
+
+using namespace MakeVariables;
+using namespace MakeTargets;
+
+constexpr unsigned short number_of_indent_spaces = 4;
+
+// Using hardcoded file extensions for now (I may expand `makemake` to support other languages/custom extensions)
+constexpr const char* CPP = ".cpp";
+constexpr const char* C = ".c";
+
+static std::string makefile_buffer = "";
+
+bool CheckMakefileExists()
+{
+    FileSys::path absolute_makefile(FileSys::absolute(constant_MakefileFileName)); // Hehe, absolute cinema
+    if(!FileSys::exists(absolute_makefile))
+    {
+        PRINT_ERROR("Cannot update '{}' as it does not exist.", absolute_makefile.generic_string())
+        return false;
+    }
+    return true;
+}
 
 bool try_SetSourceDirs()
 {
@@ -191,4 +222,196 @@ int try_ReplaceVariable(make_variable_t* variable, std::string multiline_check)
     makefile.close();
 
     return 0;
+}
+
+const char* GetMakefileBuffer()
+{ return makefile_buffer.c_str(); }
+
+void GenerateDefaultMakefile()
+{
+    makefile_buffer += LINUX_CXX.GetLine();
+    makefile_buffer += LINUX_CC.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += "ifneq ($(OS),Windows_NT)\n";
+
+    makefile_buffer += "\t" + WINDOWS_CXX_LINUX.GetLine();
+    makefile_buffer += "\t" + WINDOWS_CC_LINUX.GetLine();
+
+    makefile_buffer += "else\n";
+
+    makefile_buffer += "\t" + WINDOWS_CXX_WINDOWS.GetLine();
+    makefile_buffer += "\t" + WINDOWS_CC_WINDOWS.GetLine();
+
+    makefile_buffer += "endif\n";
+    makefile_buffer += "\n";
+
+    makefile_buffer += FLAGS_DEBUG_COMMON.GetLine();
+    makefile_buffer += FLAGS_DEBUG_LINUX.GetLine();
+    makefile_buffer += FLAGS_DEBUG_WINDOWS.GetLine();
+    makefile_buffer += FLAGS_RELEASE_COMMON.GetLine();
+    makefile_buffer += FLAGS_RELEASE_WINDOWS.GetLine();
+    makefile_buffer += FLAGS_RELEASE_LINUX.GetLine();
+    makefile_buffer += FLAGS_CXX_COMMON.GetLine();
+    makefile_buffer += FLAGS_CC_COMMON.GetLine();
+    makefile_buffer += FLAGS_WINDOWS.GetLine();
+    makefile_buffer += FLAGS_LINUX.GetLine();
+
+    try_SetLinkerFlags();
+
+    makefile_buffer += LDFLAGS_LINUX.GetLine();
+    makefile_buffer += LDFLAGS_WINDOWS.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += INCLUDE.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += DIR_ROOT.GetLine();
+    makefile_buffer += DIR_LINUX.GetLine();
+    makefile_buffer += DIR_WINDOWS.GetLine();
+    makefile_buffer += DIR_DEBUG.GetLine();
+    makefile_buffer += DIR_RELEASE.GetLine();
+    makefile_buffer += DIR_OBJS.GetLine();
+
+    makefile_buffer += "\n";
+
+    // Todo: Move this to a function(?)
+    NAME_BASE.SetValue(Options::ProgramName.GetValue());
+    makefile_buffer += NAME_BASE.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += "# LINUX\n";
+
+    makefile_buffer += "ifneq ($(OS),Windows_NT)\n";
+
+    makefile_buffer += "\t" + IfOnLinux::EXPORT_NAME.GetLine();
+    makefile_buffer += "\t" + IfOnLinux::EXPORT_BUILD_ARCH.GetLine();
+    makefile_buffer += "\t" + IfOnLinux::EXPORT_DEBUG_FLAGS.GetLine();
+    makefile_buffer += "\t" + IfOnLinux::EXPORT_RELEASE_FLAGS.GetLine();
+    makefile_buffer += "\t" + IfOnLinux::EXPORT_CXX_FLAGS.GetLine();
+    makefile_buffer += "\t" + IfOnLinux::EXPORT_CC_FLAGS.GetLine();
+    makefile_buffer += "\t" + IfOnLinux::EXPORT_LD_FLAGS.GetLine();
+    makefile_buffer += "\t" + IfOnLinux::EXPORT_CXX.GetLine();
+    makefile_buffer += "\t" + IfOnLinux::EXPORT_CC.GetLine();
+
+    makefile_buffer += "else # WINDOWS\n";
+
+    makefile_buffer += "\t" + IfOnWindows::EXPORT_NAME.GetLine();
+    makefile_buffer += "\t" + IfOnWindows::EXPORT_BUILD_ARCH.GetLine();
+    makefile_buffer += "\t" + IfOnWindows::EXPORT_DEBUG_FLAGS.GetLine();
+    makefile_buffer += "\t" + IfOnWindows::EXPORT_RELEASE_FLAGS.GetLine();
+    makefile_buffer += "\t" + IfOnWindows::EXPORT_CXX_FLAGS.GetLine();
+    makefile_buffer += "\t" + IfOnWindows::EXPORT_CC_FLAGS.GetLine();
+    makefile_buffer += "\t" + IfOnWindows::EXPORT_LD_FLAGS.GetLine();
+    makefile_buffer += "\t" + IfOnWindows::EXPORT_CXX.GetLine();
+    makefile_buffer += "\t" + IfOnWindows::EXPORT_CC.GetLine();
+
+    makefile_buffer += "endif\n";
+    makefile_buffer += "\n";
+
+    makefile_buffer += EXPORT_BUILD_VERSION.GetLine();
+    makefile_buffer += EXPORT_VERSION_FLAGS.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += EXPORT_BUILD_DIR.GetLine();
+    makefile_buffer += EXPORT_BUILD_OBJS.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += EXPORT_CLEAN_ARCH.GetLine();
+    makefile_buffer += EXPORT_CLEAN_VERSION.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += VPATH.GetLine();
+
+    makefile_buffer += "\n";
+
+    try_SetSourceDirs();
+
+    makefile_buffer += SRC.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += SRC_DIRS.GetLine();
+
+    makefile_buffer += CC_SRCS.GetLine();
+    makefile_buffer += CXX_SRCS.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += EXPORT_CC_OBJS.GetLine();
+    makefile_buffer += EXPORT_CXX_OBJS.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += EXPORT_RESET.GetLine();
+    makefile_buffer += EXPORT_BLACK.GetLine();
+    makefile_buffer += EXPORT_RED.GetLine();
+    makefile_buffer += EXPORT_GREEN.GetLine();
+    makefile_buffer += EXPORT_YELLOW.GetLine();
+    makefile_buffer += EXPORT_BLUE.GetLine();
+    makefile_buffer += EXPORT_MAGENTA.GetLine();
+    makefile_buffer += EXPORT_CYAN.GetLine();
+    makefile_buffer += EXPORT_WHITE.GetLine();
+    makefile_buffer += EXPORT_DEFAULT.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += PHONY.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += TARGET_BUILD.GetLines();
+    makefile_buffer += TARGET_LINUX.GetLines();
+    makefile_buffer += TARGET_WINDOWS.GetLines();
+    makefile_buffer += TARGET_RELEASE.GetLines();
+    makefile_buffer += TARGET_DEBUG.GetLines();
+    makefile_buffer += TARGET_BUILD_DIR.GetLines();
+
+    makefile_buffer += CLEAN_FUNCTIONS_COMMENT.GetLine();
+    makefile_buffer += CLEAN_FUNCTION.GetLine();
+    makefile_buffer += CLEAN_OBJS_FUNCTION.GetLine();
+    makefile_buffer += CLEAN_DIRTY_FUNCTION.GetLine();
+    makefile_buffer += CLEAN_PRINT_FUNCTION.GetLine();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += CLEAN_TARGET_COMMENT.GetLine();
+    makefile_buffer += TARGET_CLEAN_TARGET.GetLines();
+
+    makefile_buffer += CLEAN_ALL_COMMENT.GetLine();
+    makefile_buffer += TARGET_CLEAN_ALL.GetLines();
+
+    makefile_buffer += CLEAN_COMMENT.GetLine();
+    makefile_buffer += TARGET_CLEAN.GetLines();
+
+    makefile_buffer += MOSTLY_CLEAN_COMMENT.GetLine();
+    makefile_buffer += TARGET_MOSTLY_CLEAN.GetLines();
+
+    makefile_buffer += TARGET_DISABLE_COLORS.GetLines();
+
+    makefile_buffer += CXX_OBJS_COMMENT.GetLine();
+    makefile_buffer += TARGET_CXX_OBJS.GetLines();
+
+    makefile_buffer += C_OBJS_COMMENT.GetLine();
+    makefile_buffer += TARGET_CC_OBJS.GetLines();
+
+    makefile_buffer += PROGRAM_COMMENT.GetLine();
+    makefile_buffer += TARGET_PROGRAM.GetLines();
+
+    makefile_buffer += "\n";
+
+    makefile_buffer += NOTHING_TO_CLEAN_COMMENT.GetLine();
+    makefile_buffer += TARGET_NOTHING_TO_CLEAN.GetLines();
+
+    makefile_buffer += CLEAN_PRINTOUT_COMMENT.GetLine();
+    makefile_buffer += TARGET_CLEAN_PRINTOUT.GetLines();
+
+    makefile_buffer.pop_back(); // Remove the extraneous newline
 }
