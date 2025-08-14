@@ -19,7 +19,7 @@ FLAGS_CXX_COMMON      := -Wall -std=c++23
 FLAGS_CC_COMMON       := -Wall -std=c11
 FLAGS_WINDOWS         := # Nothing yet
 FLAGS_LINUX           := # Nothing yet
-LDFLAGS_LINUX         :=  -Lsrc/lib/Linux -lgetargs
+LDFLAGS_LINUX         := -Lsrc/lib/Linux -lgetargs
 LDFLAGS_WINDOWS       := -lstdc++exp -Lsrc/lib/Windows -lgetargs
 
 INCLUDE := -I src -I src/include
