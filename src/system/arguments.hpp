@@ -5,7 +5,7 @@
 
 namespace Flags
 {
-    inline Flag Help             ("--help", "-h");
+    inline Flag Help    ("--help"    , "-h");
     inline Flag Version ("--version" , "-v");
     inline Flag DryRun  ("--dry-run" , "-n");
     inline Flag NoColor ("--no-color"      );
@@ -16,8 +16,8 @@ namespace Flags
 
 namespace Options
 {
-    inline Option SourceDirectory ("--source", "-s");
-    inline Option ProgramName     ("--name", "-p");
+    inline Option SourceDirectory ("--source"   , "-s");
+    inline Option ProgramName     ("--name"     , "-p");
     inline Option Libraries       ("--libraries", "-l");
 }
 
@@ -30,9 +30,9 @@ R"~(    Usage: makemake [-h|--help] [-v|--version] [-n|--dry-run] [--no-color]
         -u, --update                    used with -s, -l, -p, etc; updates an existing Makefile, only changing user-specified variables/targets
         -s, --source <directory>        specify the top-level source code directory (defaults to './src')
         -l, --libraries <directory>     specify the top-level library directory, e.g: 'src/lib' (no default)
-        -p, --name <name>           set the name of the final binary (defaults to the name of the current directory)
+        -p, --name <name>               set the name of the final binary (defaults to the name of the current directory)
 )~";
 
-constexpr const char* _Version_Printout = "makemake v2.1.2";
+constexpr const char* _Version_Printout = "makemake v2.3.2";
 
 #endif // ARGUMENTS_H
