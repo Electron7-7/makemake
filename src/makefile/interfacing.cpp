@@ -203,14 +203,15 @@ int try_ReplaceVariable(make_variable_t* variable, std::string multiline_check)
     { trimmed_variable.pop_back(); }
 
     PRINT_DEBUG("Erasing: '{}{}{}{}'", Color::Back::RedBold, Color::Front::WhiteBold, makefile_string.substr(erase_start, (erase_end - erase_start)), Color::Reset);
+    PRINT_DEBUG("Inserting: '{}{}{}{}'", Color::Back::GreenBold, Color::Front::WhiteBold, trimmed_variable, Color::Reset);
 
     if(Flags::DryRun.IsActive())
     {
-        std::print("{}\n", trimmed_variable);
+#ifndef DEBUGGING
+        std::print("{}\0", trimmed_variable);
+#endif
         return 0;
     }
-
-    PRINT_DEBUG("Inserting: '{}{}{}{}'", Color::Back::GreenBold, Color::Front::WhiteBold, trimmed_variable, Color::Reset);
 
     makefile_string.erase(erase_start, (erase_end - erase_start));
     makefile_string.insert(erase_start, trimmed_variable);
