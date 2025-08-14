@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     global_ArgumentParser->AddFlag(&Flags::Help);
     global_ArgumentParser->AddFlag(&Flags::Version);
     global_ArgumentParser->AddFlag(&Flags::DryRun);
-    global_ArgumentParser->AddFlag(&Flags::UpdateSourceDirs);
+    global_ArgumentParser->AddFlag(&Flags::Update);
     global_ArgumentParser->AddFlag(&Flags::debug_NoPrintout);
 
     // Add valid options
@@ -55,23 +55,28 @@ int main(int argc, char** argv)
     if(!Options::ProgramName.HasValue())
     { Options::ProgramName.SetValue(default_ProgramName.c_str()); }
 
-    if(Flags::UpdateSourceDirs.IsActive())
-    {
-        if(!try_SetSourceDirs())
-        {
-            PRINT_ERROR("Failed to find source directory '{}'.", Options::SourceDirectory.GetValue());
-            return 1;
-        }
-        return(!try_UpdateSourceDirs()); // false == '0', true == '1'
-    }
-
     if(!Options::Libraries.HasValue())
     { Options::Libraries.SetValue(default_LibrariesDirectory); }
 
-    if(Options::Libraries.IsActive())
+    if(Flags::Update.IsActive())
     {
-        try_SetLinkerFlags();
-        return(!try_UpdateLinkerFlags()); // false == '0', true == '1'
+        if(Options::SourceDirectory.IsActive())
+        {
+            if(!try_SetSourceDirs())
+            { PRINT_ERROR("Failed to find source directory '{}'", Options::SourceDirectory.GetValue()); }
+            else
+            { try_UpdateSourceDirs(); }
+        }
+
+        if(Options::Libraries.IsActive())
+        {
+            if(!try_SetLinkerFlags())
+            { PRINT_ERROR("Failed to find libraries at '{}'", Options::Libraries.GetValue()); }
+            else
+            { try_UpdateLinkerFlags(); }
+        }
+
+        return 0; // FIXME: Return '1' if all the update functions fail
     }
 
     GenerateDefaultMakefile();
