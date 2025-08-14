@@ -1,7 +1,7 @@
 #ifndef MAKEFILE_DATA_TYPES_H
 #define MAKEFILE_DATA_TYPES_H
 
-#include <vector>
+#include <vector> // TODO: Replace with 'std::list'
 #include <string>
 
 struct make_variable_t
