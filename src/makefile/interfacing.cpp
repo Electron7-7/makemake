@@ -1,6 +1,39 @@
 #include "interfacing.hpp"
 #include "template.hpp"
 #include "system/arguments.hpp"
+
+bool try_SetLinkerFlags()
+{
+    SafeReturn<OrganizedLibraries> try_get_libraries = try_RecursiveFindLibraries();
+
+    if(try_get_libraries.Status() != Status::NO_ERROR)
+    {
+        if(Options::Libraries.IsActive()) { PRINT_WARNING("Unable to find valid libraries at '{}'", Options::Libraries.GetValue()) }
+        return false;
+    }
+
+    const OrganizedLibraries& libraries = try_get_libraries.Data();
+
+    std::string linux_ldflags = LDFLAGS_LINUX.ClearValue();
+    std::string windows_ldflags = LDFLAGS_WINDOWS.ClearValue();
+
+    for(const std::string& directory : libraries.linux_library_subdirs)
+    { linux_ldflags.append(" -L" + directory); }
+    for(const std::string& library : libraries.linux_library_files)
+    { linux_ldflags.append(" -l" + library); }
+
+    for(const std::string& directory : libraries.windows_library_subdirs)
+    { windows_ldflags.append(" -L" + directory); }
+    for(const std::string& library : libraries.windows_library_files)
+    { windows_ldflags.append(" -l" + library); }
+
+    LDFLAGS_LINUX.SetValue(linux_ldflags);
+    LDFLAGS_WINDOWS.SetValue(windows_ldflags);
+    return true;
+}
+bool try_UpdateLinkerFlags()
+{ return !static_cast<bool>(try_ReplaceVariable(&LDFLAGS_LINUX) | try_ReplaceVariable(&LDFLAGS_WINDOWS)); }
+
 int try_ReplaceVariable(make_variable_t* variable, std::string multiline_check)
 {
     if(!CheckMakefileExists()) { return 1; }
