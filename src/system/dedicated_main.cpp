@@ -55,53 +55,45 @@ int main(int argc, char** argv)
     if(!Options::ProgramName.HasValue())
     { Options::ProgramName.SetValue(default_ProgramName.c_str()); }
 
-    if(Flags::UpdateSourceDirs.IsActive() && std::filesystem::exists(std::filesystem::path("Makefile")))
+    if(Flags::UpdateSourceDirs.IsActive())
     {
-        if(!try_UpdateSourceDirectories())
+        if(!try_SetSourceDirs())
         {
-            // FIXME: Repeated code
-            PRINT_ERROR("Failed to update source directory. {}", ERR_STR_SOURCE_DIR_INVALID);
+            PRINT_ERROR("Failed to find source directory '{}'.", Options::SourceDirectory.GetValue());
             return 1;
         }
-        return 0;
+        return(!try_UpdateSourceDirs()); // false == '0', true == '1'
     }
-            }
 
     if(!Options::Libraries.HasValue())
     { Options::Libraries.SetValue(default_LibrariesDirectory); }
 
-            {
-        }
-    }
-
-    SafeReturn try_GetMakefile = try_GenerateDefaultMakefile();
-    ErrCode error_code = try_GetMakefile.ErrorCode();
-
-    if(error_code == Err::Generating::SOURCE_DIR_INVALID)
+    if(Options::Libraries.IsActive())
     {
-        // FIXME: Repeated code
-        PRINT_ERROR("Failed to generate Makefile. {}", ERR_STR_SOURCE_DIR_INVALID);
-        return 1;
+        try_SetLinkerFlags();
+        return(!try_UpdateLinkerFlags()); // false == '0', true == '1'
     }
+
+    GenerateDefaultMakefile();
 
     if(Flags::DryRun.IsActive())
     {
         if(!Flags::debug_NoPrintout.IsActive())
-        { std::print("{}\n", try_GetMakefile.Data()); }
+        { std::print("{}\n", GetMakefileBuffer()); }
         return 0;
     }
 
-    std::ofstream makefile("Makefile");
+    std::ofstream makefile(constant_MakefileFileName);
     if(makefile)
     {
-        makefile << try_GetMakefile.Data();
-        makefile.close();
+        makefile << GetMakefileBuffer();
     }
     else
     {
-        PRINT_ERROR("Unable to write to {}!", (std::filesystem::current_path().string() + "/Makefile"));
+        PRINT_ERROR("Unable to write to {}!", std::filesystem::absolute(constant_MakefileFileName).generic_string());
         return 1;
     }
 
+    makefile.close(); // FIXME: I don't know if you also need to call 'close' when the filestream fails
     return 0;
 }
