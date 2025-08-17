@@ -14,7 +14,7 @@ namespace MakeVariables
     static make_variable_t WINDOWS_CXX_WINDOWS = { "WINDOWS_CXX", "g++" , " := "  };
     static make_variable_t WINDOWS_CC_WINDOWS  = { "WINDOWS_CC" , "gcc" , "  := " };
 
-    static make_variable_t FLAGS_DEBUG_COMMON    = { "FLAGS_DEBUG_COMMON"    , "-O0 -D DEBUGGING"          , "    := "        };
+    static make_variable_t FLAGS_DEBUG_COMMON    = { "FLAGS_DEBUG_COMMON"    , "-g -O0 -D DEBUGGING"          , "    := "        };
     static make_variable_t FLAGS_DEBUG_LINUX     = { "FLAGS_DEBUG_LINUX"     , "-fsanitize=address"        , "     := "       };
     static make_variable_t FLAGS_DEBUG_WINDOWS   = { "FLAGS_DEBUG_WINDOWS"   , make_variable_t::EMPTY      , "   := "         };
     static make_variable_t FLAGS_RELEASE_COMMON  = { "FLAGS_RELEASE_COMMON"  , "-O3"                       , "  := "          };
